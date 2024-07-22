@@ -113,11 +113,11 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
-        for (int c=0;c< board.size();c++) {
+        for (int c=0;c< board.size();c+=1) {
             int to_row = 0;
             int null_row = 0;
             int value = 0;
-            for (int r = 0; r < board.size(); r++) {
+            for (int r = 0; r < board.size(); r+=1) {
                 Tile t = board.tile(c, r);
                 if (t != null) {
                     if (t.value() == value) {
@@ -127,17 +127,22 @@ public class Model extends Observable {
                         null_row += 1;
                         score+=2*value;
                         value = 0;
-                    } else if (null_row > 0) {
-                        if (value > 0) {
-                            to_row += 1;
-                        }
+                    } else if (value == 0) {
                         value = t.value();
-                        board.move(c, to_row, t);
-                        changed=true;
+                        if(null_row>0) {
+                            board.move(c, to_row, t);
+                            changed = true;
+                        }
+                    }else{
+                        to_row+=1;
+                        value = t.value();
+                        if(null_row>0){
+                            board.move(c, to_row, t);
+                            changed = true;
+                        }
                     }
                 } else {
                     null_row += 1;
-                    changed=true;
                 }
             }
         }
