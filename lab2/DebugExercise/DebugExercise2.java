@@ -46,7 +46,13 @@ public class DebugExercise2 {
         }
         int[] returnArray = new int[a.length];
         for (int i = 0; i < a.length; i += 1) {
-            int biggerValue = max(a[i], b[i]);
+            int biggerValue;
+            if(a[i]>b[i]){
+                biggerValue=a[i];
+            }else{
+                biggerValue=b[i];
+            }
+            //int biggerValue = max(a[i], b[i]);
             returnArray[i] = biggerValue;
         }
 
@@ -70,7 +76,11 @@ public class DebugExercise2 {
      * */
     public static int sumOfElementwiseMaxes(int[] a, int[] b) {
         int[] maxes = arrayMax(a, b);
-        int sumofMaxes = arraySum(maxes);
+        int sumofMaxes=0;
+        for(int i : maxes){
+            sumofMaxes+=i;
+        }
+        //int sumofMaxes = arraySum(maxes);
         return sumofMaxes;
     }
 
