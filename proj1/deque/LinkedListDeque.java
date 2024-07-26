@@ -2,16 +2,16 @@ package deque;
 
 public class LinkedListDeque<AnyClass> {
 
-    private IntNode sentinel;
+    private IntNode sentinel=new IntNode(null,null,null);
     private int size;
 
     public LinkedListDeque(){
-        sentinel=new IntNode(null,sentinel,sentinel);
+        sentinel.prev=sentinel;
+        sentinel.next=sentinel;
         size=0;
     }
 
     public LinkedListDeque(AnyClass i){
-        sentinel=new IntNode(null,sentinel,sentinel);
         IntNode first=new IntNode(i,sentinel,sentinel);
         sentinel.next=first;
         sentinel.prev=first;
@@ -65,16 +65,24 @@ public class LinkedListDeque<AnyClass> {
     }
 
     public AnyClass removeFirst(){
+        if (size==0){
+            return null;
+        }
         AnyClass r=sentinel.next.item;
         sentinel.next.next.prev=sentinel;
         sentinel.next=sentinel.next.next;
+        size-=1;
         return r;
     }
 
     public AnyClass removeLast(){
+        if (size==0){
+            return null;
+        }
         AnyClass r=sentinel.prev.item;
         sentinel.prev.prev.next=sentinel;
         sentinel.prev=sentinel.prev.prev;
+        size-=1;
         return r;
     }
 
