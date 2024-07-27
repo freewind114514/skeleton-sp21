@@ -14,8 +14,8 @@ public class ArrayDeque<Any> {
     }
 
     public ArrayDeque(ArrayDeque other){
-        items=(Any[]) new Object[other.size];
-        System.arraycopy(other.items, 0, items, 0, other.size);
+        items=(Any[]) new Object[other.items.length];
+        System.arraycopy(other.items, 0, items, 0, other.items.length);
         size= other.size;
         nextfirst= other.nextfirst;
         nextlast= other.nextlast;
