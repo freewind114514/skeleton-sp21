@@ -18,6 +18,15 @@ public class LinkedListDeque<AnyClass> {
         size=1;
     }
 
+    public LinkedListDeque(LinkedListDeque other){
+        sentinel.prev=sentinel;
+        sentinel.next=sentinel;
+        size=0;
+        for(int i = 0; i< other.size();i++){
+            addLast((AnyClass) other.get(i));
+        }
+    }
+
     public class IntNode {
         public IntNode prev;
         public AnyClass item;
@@ -95,6 +104,22 @@ public class LinkedListDeque<AnyClass> {
             p=p.next;
         }
         return p.item;
+    }
+
+    public AnyClass getRecursive(int index){
+        if (index>=size){
+            return null;
+        }
+        IntNode p=sentinel.next;
+        return gethelper(index,p);
+    }
+
+    private AnyClass gethelper(int i,IntNode p){
+        if (i==0){
+            return p.item;
+        }else {
+            return gethelper(i-1,p.next);
+        }
     }
 
 }
