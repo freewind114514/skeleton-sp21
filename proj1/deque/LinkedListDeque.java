@@ -1,6 +1,6 @@
 package deque;
 
-public class LinkedListDeque<AnyClass> {
+public class LinkedListDeque<T> {
 
     private IntNode sentinel=new IntNode(null,null,null);
     private int size;
@@ -11,42 +11,35 @@ public class LinkedListDeque<AnyClass> {
         size=0;
     }
 
-    public LinkedListDeque(AnyClass i){
-        IntNode first=new IntNode(i,sentinel,sentinel);
-        sentinel.next=first;
-        sentinel.prev=first;
-        size=1;
-    }
-
     public LinkedListDeque(LinkedListDeque other){
         sentinel.prev=sentinel;
         sentinel.next=sentinel;
         size=0;
         for(int i = 0; i< other.size();i++){
-            addLast((AnyClass) other.get(i));
+            addLast((T) other.get(i));
         }
     }
 
     public class IntNode {
         public IntNode prev;
-        public AnyClass item;
+        public T item;
         public IntNode next;
 
-        public IntNode(AnyClass i,IntNode p,IntNode n){
+        public IntNode(T i,IntNode p,IntNode n){
             item=i;
             prev=p;
             next=n;
         }
     }
 
-    public void addFirst(AnyClass i){
+    public void addFirst(T i){
         IntNode newone=new IntNode(i,sentinel,sentinel.next);
         sentinel.next.prev=newone;
         sentinel.next=newone;
         size+=1;
     }
 
-    public void addLast(AnyClass i){
+    public void addLast(T i){
         IntNode newone=new IntNode(i,sentinel.prev,sentinel);
         sentinel.prev.next=newone;
         sentinel.prev=newone;
@@ -73,29 +66,29 @@ public class LinkedListDeque<AnyClass> {
         System.out.println();
     }
 
-    public AnyClass removeFirst(){
+    public T removeFirst(){
         if (size==0){
             return null;
         }
-        AnyClass r=sentinel.next.item;
+        T r=sentinel.next.item;
         sentinel.next.next.prev=sentinel;
         sentinel.next=sentinel.next.next;
         size-=1;
         return r;
     }
 
-    public AnyClass removeLast(){
+    public T removeLast(){
         if (size==0){
             return null;
         }
-        AnyClass r=sentinel.prev.item;
+        T r=sentinel.prev.item;
         sentinel.prev.prev.next=sentinel;
         sentinel.prev=sentinel.prev.prev;
         size-=1;
         return r;
     }
 
-    public AnyClass get(int index){
+    public T get(int index){
         if (index>=size){
             return null;
         }
@@ -106,7 +99,7 @@ public class LinkedListDeque<AnyClass> {
         return p.item;
     }
 
-    public AnyClass getRecursive(int index){
+    public T getRecursive(int index){
         if (index>=size){
             return null;
         }
@@ -114,7 +107,7 @@ public class LinkedListDeque<AnyClass> {
         return gethelper(index,p);
     }
 
-    private AnyClass gethelper(int i,IntNode p){
+    private T gethelper(int i,IntNode p){
         if (i==0){
             return p.item;
         }else {

@@ -1,20 +1,20 @@
 package deque;
 
-public class ArrayDeque<Any> {
-    private Any[] items;
+public class ArrayDeque<T> {
+    private T[] items;
     private int size;
     private int nextfirst;
     private int nextlast;
 
     public ArrayDeque(){
-        items=(Any[]) new Object[8];
+        items=(T[]) new Object[8];
         size=0;
         nextfirst=3;
         nextlast=4;
     }
 
     public ArrayDeque(ArrayDeque other){
-        items=(Any[]) new Object[other.items.length];
+        items=(T[]) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.items.length);
         size= other.size;
         nextfirst= other.nextfirst;
@@ -22,7 +22,7 @@ public class ArrayDeque<Any> {
     }
 
     private void resize(int cap){
-        Any[] r=(Any[]) new Object[cap+size];
+        T[] r=(T[]) new Object[cap+size];
         System.arraycopy(items,0, r,0, nextlast);
         System.arraycopy(items,nextlast, r,nextlast+cap, size-nextlast);
         nextfirst+=cap;
@@ -30,7 +30,7 @@ public class ArrayDeque<Any> {
         items=r;
     }
 
-    public void addFirst(Any i){
+    public void addFirst(T i){
         if(size==items.length){
             resize(size);
         }
@@ -42,7 +42,7 @@ public class ArrayDeque<Any> {
         }
     }
 
-    public void addLast(Any i){
+    public void addLast(T i){
         if(size==items.length){
             resize(size);
         }
@@ -75,7 +75,7 @@ public class ArrayDeque<Any> {
         System.out.println();
     }
 
-    public Any removeFirst(){
+    public T removeFirst(){
         if (size==0){
             return null;
         }
@@ -85,12 +85,12 @@ public class ArrayDeque<Any> {
         }else {
             nextfirst++;
         }
-        Any r=items[nextfirst];
+        T r=items[nextfirst];
         items[nextfirst]=null;
         return r;
     }
 
-    public Any removeLast(){
+    public T removeLast(){
         if (size==0){
             return null;
         }
@@ -100,12 +100,12 @@ public class ArrayDeque<Any> {
         }else {
             nextlast--;
         }
-        Any r=items[nextlast];
+        T r=items[nextlast];
         items[nextlast]=null;
         return r;
     }
 
-    public Any get(int index){
+    public T get(int index){
         index+=nextfirst+1;
         if(index>= items.length){
             index-= items.length;
