@@ -1,6 +1,8 @@
 package deque;
 
-public class ArrayDeque<T> {
+import java.util.Iterator;
+
+public class ArrayDeque<T> implements Iterable<T>{
     private T[] items;
     private int size;
     private int nextfirst;
@@ -13,6 +15,51 @@ public class ArrayDeque<T> {
         nextlast=4;
     }
 
+    public Iterator<T> iterator(){
+        return new ArrayIterator();
+    }
+
+    private class ArrayIterator implements Iterator<T> {
+        private int wizPos;
+
+        public ArrayIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        public T next() {
+            T returnItem = items[wizPos];
+            wizPos += 1;
+            return returnItem;
+        }
+    }
+
+    public boolean equals(Object other){
+        if (this == other) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (other.getClass() != this.getClass()) {
+            return false;
+        }
+        ArrayDeque<T> o = (ArrayDeque<T>) other;
+        if (o.size() != this.size()) {
+            return false;
+        }
+        for (int i = 0; i < size; i++) {
+            if (!o.get(i).equals(this.get(i))){
+                return false;
+            }
+        }
+        return true;
+
+    }
+
     public ArrayDeque(ArrayDeque other){
         items=(T[]) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.items.length);
@@ -22,9 +69,9 @@ public class ArrayDeque<T> {
     }
 
     private void resize(int cap){
-        T[] r=(T[]) new Object[cap+size];
+        T[] r=(T[]) new Object[cap+ items.length];
         System.arraycopy(items,0, r,0, nextlast);
-        System.arraycopy(items,nextlast, r,nextlast+cap, size-nextlast);
+        System.arraycopy(items, nextfirst+1, r,nextfirst+1+cap, items.length-nextfirst-1);
         nextfirst+=cap;
         nextlast++;
         items=r;
