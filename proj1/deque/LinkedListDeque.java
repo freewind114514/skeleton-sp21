@@ -13,14 +13,14 @@ public class LinkedListDeque<T> implements Iterable<T>{
         size=0;
     }
 
-    public LinkedListDeque(LinkedListDeque other){
+    /**public LinkedListDeque(LinkedListDeque other){
         sentinel.prev=sentinel;
         sentinel.next=sentinel;
         size=0;
         for(int i = 0; i< other.size();i++){
             addLast((T) other.get(i));
         }
-    }
+    }*/
 
     private class IntNode {
         public IntNode prev;

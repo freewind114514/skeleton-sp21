@@ -60,13 +60,13 @@ public class ArrayDeque<T> implements Iterable<T>{
 
     }
 
-    public ArrayDeque(ArrayDeque other){
+    /**public ArrayDeque(ArrayDeque other){
         items=(T[]) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.items.length);
         size= other.size;
         nextfirst= other.nextfirst;
         nextlast= other.nextlast;
-    }
+    }*/
 
     private void resize(int cap){
         T[] r=(T[]) new Object[cap+ items.length];
