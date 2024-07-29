@@ -37,6 +37,7 @@ public class ArrayDeque<T> implements Iterable<T>{
         }
     }
 
+    @Override
     public boolean equals(Object other){
         if (this == other) {
             return true;
@@ -99,13 +100,6 @@ public class ArrayDeque<T> implements Iterable<T>{
         if(nextlast>= items.length){
             nextlast-= items.length;
         }
-    }
-
-    public boolean isEmpty(){
-        if(size==0){
-            return true;
-        }
-        return false;
     }
 
     public int size(){
