@@ -6,48 +6,27 @@ import static org.junit.Assert.*;
 public class ArrayDequeTest {
     @Test
     public void AddGetTest() {
-        ArrayDeque<Integer> a = new ArrayDeque<>();
-        a.addFirst(1);
-        a.addLast(2);
-        a.addLast(3);
-        a.addLast(4);
-        a.addLast(5);
-        a.addLast(6);
-        a.addLast(7);
-        a.addLast(8);
-        a.addLast(9);
-        a.addLast(10);
-        a.addLast(11);
-        a.addLast(12);
-        a.addLast(13);
-        int correct = 12;
-        int anw = a.get(11);
+        ArrayDeque<Integer> A = new ArrayDeque<>();
+        A.addLast(0);
+        A.addLast(1);
+        A.addFirst(2);
+        A.get(0);
+        A.addLast(4);
+        A.addFirst(5);
+        A.addLast(6);
+        A.addFirst(7);
+        A.addFirst(8);
+        A.addLast(9);
+        A.removeLast();
+        A.addFirst(11);
+        A.addLast(12);
+        A.addLast(13);
+        A.addLast(14);
+        A.addFirst(15);
+        A.removeFirst();
+        int correct = 4;
+        int anw = A.get(7);
         assertEquals("worong", correct, anw);
-    }
-
-    @Test
-    public void IterTest(){
-        ArrayDeque<Integer> a = new ArrayDeque<>();
-        a.addFirst(1);
-        a.addLast(2);
-        a.addLast(3);
-        a.addLast(4);
-        a.addLast(5);
-        a.addLast(6);
-        a.addLast(7);
-        a.addLast(8);
-        a.addLast(9);
-        a.addLast(10);
-        a.addLast(11);
-        a.addLast(12);
-        a.addLast(13);
-        ArrayDeque<Integer> b = new ArrayDeque(a);
-        b.removeLast();
-        b.addLast(114514);
-        assertFalse("?", a.equals(b));
-        b.removeLast();
-        b.addLast(13);
-        assertTrue("?", a.equals(b));
     }
 
 }

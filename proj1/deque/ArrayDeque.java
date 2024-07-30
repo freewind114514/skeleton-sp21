@@ -60,19 +60,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     }
 
-    public ArrayDeque(ArrayDeque other){
+    /**public ArrayDeque(ArrayDeque other){
         items=(T[]) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.items.length);
         size= other.size;
         nextfirst= other.nextfirst;
         nextlast= other.nextlast;
-    }
+    }*/
 
     private void resize(int cap){
         T[] r=(T[]) new Object[cap+ items.length];
         System.arraycopy(items,0, r,0, nextlast);
         System.arraycopy(items, nextlast, r,nextlast+cap, size-nextlast);
-        nextfirst += cap;
+        nextfirst = nextlast+cap-1;
         items = r;
     }
 
@@ -115,17 +115,17 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     public T removeFirst(){
-        if (size==0){
+        if (isEmpty()){
             return null;
         }
         size--;
-        if(nextfirst== items.length-1){
-            nextfirst= 0;
+        if(nextfirst == items.length - 1){
+            nextfirst = 0;
         }else {
             nextfirst++;
         }
-        T r=items[nextfirst];
-        items[nextfirst]=null;
+        T r = items[nextfirst];
+        items[nextfirst] = null;
         return r;
     }
 
@@ -134,20 +134,20 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             return null;
         }
         size--;
-        if(nextlast== 0){
-            nextlast= items.length-1;
+        if(nextlast == 0){
+            nextlast = items.length-1;
         }else {
             nextlast--;
         }
-        T r=items[nextlast];
-        items[nextlast]=null;
+        T r = items[nextlast];
+        items[nextlast] = null;
         return r;
     }
 
     public T get(int index){
-        index+=nextfirst+1;
-        if(index>= items.length){
-            index-= items.length;
+        index += nextfirst+1;
+        if(index >= items.length){
+            index -= items.length;
         }
         return items[index];
     }
