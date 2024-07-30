@@ -44,18 +44,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         if (other == null) {
             return false;
         }
-        if (other.getClass() != this.getClass()) {
-            LinkedListDeque<String> t = new LinkedListDeque();
-            if (other.getClass() != t.getClass()) {
-                return false;
-            }
+        if (!(other instanceof Deque)) {
+            return false;
         }
-        ArrayDeque<T> o = (ArrayDeque<T>) other;
+        Deque<T> o = (Deque<T>) other;
         if (o.size() != this.size()) {
             return false;
         }
         for (int i = 0; i < size; i++) {
-            if (!o.get(i).equals(this.get(i))){
+            if (get(i) != o.get(i)) {
                 return false;
             }
         }
@@ -148,7 +145,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             T[] t=(T[]) new Object[cab];
             if (nextlast < nextfirst) {
                 System.arraycopy(items, 0, t, 0, nextlast);
-                System.arraycopy(items, nextfirst+1, t, nextfirst+1+cab, size-nextlast);
+                System.arraycopy(items, nextfirst+1, t, nextfirst+1-cab, size-nextlast);
                 nextfirst -= cab;
             } else {
                 System.arraycopy(items, nextfirst+1, t, 1, size);

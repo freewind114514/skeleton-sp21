@@ -28,8 +28,6 @@ public class ArrayDequeTest {
         int anw = A.get(7);
         Deque<Integer> B = new LinkedListDeque<>();
         assertEquals("worong", correct, anw);
-        System.out.println(A.getClass());
-        System.out.println(B.getClass());
     }
 
 }
