@@ -25,11 +25,11 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
      */
 
     private class IntNode {
-        public IntNode prev;
-        public T item;
-        public IntNode next;
+        private IntNode prev;
+        private T item;
+        private IntNode next;
 
-        public IntNode(T i, IntNode p, IntNode n) {
+        IntNode(T i, IntNode p, IntNode n) {
             item = i;
             prev = p;
             next = n;
@@ -43,7 +43,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class LinkIterator implements Iterator<T> {
         private IntNode p;
 
-        public LinkIterator() {
+        LinkIterator() {
             p = sentinel.next;
         }
 

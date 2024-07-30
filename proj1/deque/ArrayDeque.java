@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items = (T[]) new Object[8];
-    ;
     private int size;
     private int nextfirst;
     private int nextlast;
@@ -101,7 +100,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T r = items[nextfirst];
         items[nextfirst] = null;
-        ShrinkSize();
+        Shrinksize();
         return r;
     }
 
@@ -117,11 +116,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T r = items[nextlast];
         items[nextlast] = null;
-        ShrinkSize();
+        Shrinksize();
         return r;
     }
 
-    private void ShrinkSize() {
+    private void Shrinksize() {
         boolean r = (size * 4) < items.length;
         if (items.length >= 16 && r) {
             int cab = items.length / 2;
@@ -150,7 +149,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private class ArrayIterator implements Iterator<T> {
         private int wizPos;
 
-        public ArrayIterator() {
+        ArrayIterator() {
             wizPos = 0;
         }
 
