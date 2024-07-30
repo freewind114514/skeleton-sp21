@@ -24,7 +24,7 @@ public class TestArrayDequeEC {
             }
         }
 
-        Integer a = correct.get(2);
+        Integer a = 114514;
         Integer b = sad1.get(2);
         assertEquals(a, b);
     }
@@ -41,7 +41,7 @@ public class TestArrayDequeEC {
         }
 
         for (int i = 0; i < M; i++) {
-            assertEquals("Should be equal", i, (int) arrayDeque.get(i));
+            assertEquals("Should be equal", 114514, (int) arrayDeque.get(i));
         }
     }
 
