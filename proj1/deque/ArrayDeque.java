@@ -3,13 +3,12 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
-    private T[] items;
+    private T[] items=(T[]) new Object[8];;
     private int size;
     private int nextfirst;
     private int nextlast;
 
     public ArrayDeque(){
-        items=(T[]) new Object[8];
         size=0;
         nextfirst=3;
         nextlast=4;
@@ -31,7 +30,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
 
         public T next() {
-            T returnItem = items[wizPos];
+            T returnItem = get(wizPos);
             wizPos += 1;
             return returnItem;
         }
@@ -61,21 +60,20 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     }
 
-    /**public ArrayDeque(ArrayDeque other){
+    public ArrayDeque(ArrayDeque other){
         items=(T[]) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.items.length);
         size= other.size;
         nextfirst= other.nextfirst;
         nextlast= other.nextlast;
-    }*/
+    }
 
     private void resize(int cap){
         T[] r=(T[]) new Object[cap+ items.length];
         System.arraycopy(items,0, r,0, nextlast);
-        System.arraycopy(items, nextfirst+1, r,nextfirst+1+cap, items.length-nextfirst-1);
-        nextfirst+=cap;
-        nextlast++;
-        items=r;
+        System.arraycopy(items, nextlast, r,nextlast+cap, size-nextlast);
+        nextfirst += cap;
+        items = r;
     }
 
     public void addFirst(T i){
