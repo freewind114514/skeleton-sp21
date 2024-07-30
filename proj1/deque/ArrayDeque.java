@@ -63,7 +63,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     }
 
-    private void resize(int cap){
+    private void addsize(int cap){
         T[] r=(T[]) new Object[cap+ items.length];
         System.arraycopy(items,0, r,0, nextlast);
         System.arraycopy(items, nextlast, r,nextlast+cap, size-nextlast);
@@ -73,7 +73,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     public void addFirst(T i){
         if(size == items.length){
-            resize(size);
+            addsize(size);
         }
         items[nextfirst] = i;
         size++;
@@ -85,7 +85,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     public void addLast(T i){
         if(size==items.length){
-            resize(size);
+            addsize(size);
         }
         items[nextlast]= i;
         size++;
@@ -121,6 +121,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
         T r = items[nextfirst];
         items[nextfirst] = null;
+        ShrinkSize();
         return r;
     }
 
@@ -136,7 +137,26 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         }
         T r = items[nextlast];
         items[nextlast] = null;
+        ShrinkSize();
         return r;
+    }
+
+    private void ShrinkSize(){
+        boolean r = (size * 4) < items.length;
+        if (items.length >= 16 && r) {
+            int cab = items.length / 2;
+            T[] t=(T[]) new Object[cab];
+            if (nextlast < nextfirst) {
+                System.arraycopy(items, 0, t, 0, nextlast);
+                System.arraycopy(items, nextfirst+1, t, nextfirst+1+cab, size-nextlast);
+                nextfirst -= cab;
+            } else {
+                System.arraycopy(items, nextfirst+1, t, 1, size);
+                nextfirst = 0;
+                nextlast = size + 1;
+            }
+            items = t;
+        }
     }
 
     public T get(int index){
