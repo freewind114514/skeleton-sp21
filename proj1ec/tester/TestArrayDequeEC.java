@@ -28,6 +28,22 @@ public class TestArrayDequeEC {
         Integer b = sad1.get(2);
         assertEquals(a, b);
     }
+    
+
+    @Test
+    public void getBigAmountTest() {
+        StudentArrayDeque<Integer> arrayDeque = new StudentArrayDeque<>();
+
+        int M = 1000000;
+
+        for (int i = 0; i < M; i++) {
+            arrayDeque.addLast(i);
+        }
+
+        for (int i = 0; i < M; i++) {
+            assertEquals("Should be equal", i, (int) arrayDeque.get(i));
+        }
+    }
 
     @Test
     public void test1(){
@@ -49,4 +65,5 @@ public class TestArrayDequeEC {
         Integer b = sad2.size();
         assertEquals(a, b);
     }
+
 }
