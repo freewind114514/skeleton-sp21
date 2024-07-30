@@ -26,6 +26,27 @@ public class TestArrayDequeEC {
 
         Integer a = correct.get(2);
         Integer b = sad1.get(2);
-        assertEquals("random addLast addFirst get(2)", a, b);
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void test1(){
+        StudentArrayDeque<Integer> sad2 = new StudentArrayDeque<>();
+        ArrayDequeSolution<Integer> correct = new ArrayDequeSolution<>();
+
+        for (int i = 0; i < 10; i += 1) {
+            double numberBetweenZeroAndOne = StdRandom.uniform();
+
+            if (numberBetweenZeroAndOne < 0.5) {
+                sad2.addLast(i);
+                correct.addLast(i);
+            } else {
+                sad2.addFirst(i);
+                correct.addLast(i);
+            }
+        }
+        Integer a = 114514;
+        Integer b = sad2.size();
+        assertEquals(a, b);
     }
 }
