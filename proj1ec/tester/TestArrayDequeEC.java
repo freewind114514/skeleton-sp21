@@ -1,14 +1,14 @@
 package tester;
 
-import static org.junit.Assert.*;
-
 import edu.princeton.cs.introcs.StdRandom;
 import org.junit.Test;
 import student.StudentArrayDeque;
 
+import static org.junit.Assert.assertEquals;
+
 public class TestArrayDequeEC {
     @Test
-    public void Test_all(){
+    public void Test_all() {
         StudentArrayDeque<Integer> sad1 = new StudentArrayDeque<>();
         ArrayDequeSolution<Integer> correct = new ArrayDequeSolution<>();
 
@@ -26,6 +26,6 @@ public class TestArrayDequeEC {
 
         Integer a = correct.get(2);
         Integer b = sad1.get(2);
-        assertEquals("random addLast addFirst get(2)",a,b);
+        assertEquals("random addLast addFirst get(2)", a, b);
     }
 }

@@ -100,7 +100,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T r = items[nextfirst];
         items[nextfirst] = null;
-        Shrinksize();
+        shrinkSize();
         return r;
     }
 
@@ -116,11 +116,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
         T r = items[nextlast];
         items[nextlast] = null;
-        Shrinksize();
+        shrinkSize();
         return r;
     }
 
-    private void Shrinksize() {
+    private void shrinkSize() {
         boolean r = (size * 4) < items.length;
         if (items.length >= 16 && r) {
             int cab = items.length / 2;
