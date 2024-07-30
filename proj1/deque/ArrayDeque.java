@@ -45,7 +45,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             return false;
         }
         if (other.getClass() != this.getClass()) {
-            return false;
+            LinkedListDeque<String> t = new LinkedListDeque();
+            if (other.getClass() != t.getClass()) {
+                return false;
+            }
         }
         ArrayDeque<T> o = (ArrayDeque<T>) other;
         if (o.size() != this.size()) {
@@ -60,31 +63,23 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     }
 
-    /**public ArrayDeque(ArrayDeque other){
-        items=(T[]) new Object[other.items.length];
-        System.arraycopy(other.items, 0, items, 0, other.items.length);
-        size= other.size;
-        nextfirst= other.nextfirst;
-        nextlast= other.nextlast;
-    }*/
-
     private void resize(int cap){
         T[] r=(T[]) new Object[cap+ items.length];
         System.arraycopy(items,0, r,0, nextlast);
         System.arraycopy(items, nextlast, r,nextlast+cap, size-nextlast);
-        nextfirst = nextlast+cap-1;
+        nextfirst = nextlast + cap - 1;
         items = r;
     }
 
     public void addFirst(T i){
-        if(size==items.length){
+        if(size == items.length){
             resize(size);
         }
-        items[nextfirst]= i;
+        items[nextfirst] = i;
         size++;
         nextfirst--;
         if(nextfirst<0){
-            nextfirst+= items.length;
+            nextfirst += items.length;
         }
     }
 
@@ -130,7 +125,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     public T removeLast(){
-        if (size==0){
+        if (isEmpty()){
             return null;
         }
         size--;
