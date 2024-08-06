@@ -1,4 +1,5 @@
 package gitlet;
+import java.time.ZonedDateTime;
 
 // TODO: any imports you need here
 
@@ -11,6 +12,12 @@ import java.util.Date; // TODO: You'll likely use this in this class
  *  @author TODO
  */
 public class Commit {
+    public static final Commit InitialCommit = null;
+    public static Commit HEAD = InitialCommit;
+    private Commit parent;
+    private String hash;
+    private ZonedDateTime time;
+    private String branch;
     /**
      * TODO: add instance variables here.
      *
@@ -22,5 +29,13 @@ public class Commit {
     /** The message of this Commit. */
     private String message;
 
+    public Commit(String sha, String m){
+        message = m;
+        branch = parent.branch;
+        hash = sha;
+        time = ZonedDateTime.now();
+        parent = HEAD;
+
+    }
     /* TODO: fill in the rest of this class. */
 }
