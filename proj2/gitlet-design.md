@@ -31,13 +31,17 @@ just make new commit
 * a constructor
 * read a`file`return a`Commit`class
 * write method
-
+* `public String message()`
+* `public ZonedDateTime timestamp()`
+* toString method commit hash number, timestamp, message 
 
 
 ***
 
 
 ### Repository
+* persistence 
+* create directory and file
 
 #### Fields
 
