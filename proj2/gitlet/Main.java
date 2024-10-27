@@ -15,11 +15,13 @@ public class Main {
             System.out.println("Please enter a command.");
             System.exit(0);
         }
-        String firstArg = args[0];
-        switch(firstArg) {
+
+        switch(args[0]) {
             case "init":
                 checkArgsNumber(args, 1);
                 init();
+                break;
+                
             case "add":
                 checkGitlet();
                 checkArgsNumber(args, 2);
