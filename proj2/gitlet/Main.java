@@ -11,7 +11,6 @@ public class Main {
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
     public static void main(String[] args) {
-        // TODO: what if args is empty?
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             System.exit(0);
@@ -19,47 +18,47 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                validateNumArgs(args, 1);
+                checkArgsNumber(args, 1);
                 init();
             case "add":
                 checkGitlet();
-                validateNumArgs(args, 2);
+                checkArgsNumber(args, 2);
                 add(args[1]);
                 break;
 
             case "remove":
                 checkGitlet();
-                validateNumArgs(args, 2);
+                checkArgsNumber(args, 2);
                 rm(args[1]);
                 break;
 
             case "commit":
                 checkGitlet();
-                validateNumArgs(args, 2);
+                checkArgsNumber(args, 2);
                 commit(args[1]);
                 break;
 
             case "log":
                 checkGitlet();
-                validateNumArgs(args, 1);
+                checkArgsNumber(args, 1);
                 log();
                 break;
 
             case "global-log":
                 checkGitlet();
-                validateNumArgs(args, 1);
+                checkArgsNumber(args, 1);
                 globalLog();
                 break;
 
             case "find":
                 checkGitlet();
-                validateNumArgs(args, 2);
+                checkArgsNumber(args, 2);
                 find(args[1]);
                 break;
 
             case "status":
                 checkGitlet();
-                validateNumArgs(args, 1);
+                checkArgsNumber(args, 1);
                 status();
                 break;
 
@@ -76,8 +75,8 @@ public class Main {
 
     }
 
-    private static void validateNumArgs(String[] args, int n) {
-        if (args.length != n) {
+    private static void checkArgsNumber(String[] args, int number) {
+        if (args.length != number) {
             System.out.println("Incorrect operands.");
             System.exit(0);
         }
