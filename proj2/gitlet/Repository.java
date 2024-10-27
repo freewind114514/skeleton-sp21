@@ -173,11 +173,11 @@ public class Repository {
             if (filenames.contains(filename)) {
                 String id = sha1(readContents(join(CWD, filename)));
                 if (!Track.get(filename).equals(id) && stage.AddNotContains(filename)) {
-                    M.addLast(filename);
+                    M.add(filename);
                 }
             }else {
                 if (!stage.ifRmStageContains(filename)){
-                    M.addLast(filename);
+                    M.add(filename);
                 }
             }
         }
@@ -186,10 +186,10 @@ public class Repository {
                 String id1 = sha1(readContents(join(CWD, filename)));
                 String id2 = sha1(addStage.get(filename));
                 if (!id1.equals(id2)) {
-                    M.addLast(filename);
+                    M.add(filename);
                 }
             }else {
-                M.addLast(filename);
+                M.add(filename);
             }
         }
         Collections.sort(M);
@@ -209,10 +209,10 @@ public class Repository {
         List<String> U = new ArrayList<>();
         for (String filename : filenames){
             if (stage.AddNotContains(filename) && !Track.keySet().contains(filename)){
-                U.addLast(filename);
+                U.add(filename);
             }
             if (stage.ifRmStageContains(filename)){
-                U.addLast(filename);
+                U.add(filename);
             }
         }
         Collections.sort(U);
