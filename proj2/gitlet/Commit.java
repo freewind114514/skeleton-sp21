@@ -62,7 +62,7 @@ public class Commit implements Serializable {
         ZonedDateTime now = ZonedDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy x");
         time = now.format(formatter);
-        CID = sha1(message, parent, time, Track);
+        CID = sha1(message, parent, time, Track.toString());
     }
 
 
