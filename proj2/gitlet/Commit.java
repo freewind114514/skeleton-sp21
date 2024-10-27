@@ -2,8 +2,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
@@ -17,10 +17,11 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable {
 
     private String CID;
-    private String parent;
+    private List<String> parents;
     private String time;
     private Map<String, String> Track;
     private String message;
+    private Date date;
     private boolean merge = false;
     /**
      *
@@ -32,12 +33,23 @@ public class Commit implements Serializable {
     /** The message of this Commit. */
 
 
-    public Commit(String m, String parentID){
-        time = "Thu Jan 1 00:00:00 1970 -0800";
-        message = m;
-        parent = parentID;
+    public Commit(){
+        date = new Date(0);
+        time = getTimestamp();
+        message = "initial commit";
+        parents = new ArrayList<>();;
         Track = new TreeMap<>();
-        CID = sha1(message, parent, time, Track.toString());
+        CID = generateId();
+    }
+
+    private String generateId(){
+        return sha1(getTimestamp(), message, parents.toString(), Track.toString());
+    }
+
+    public String getTimestamp() {
+        // Thu Jan 1 00:00:00 1970 +0000
+        DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+        return dateFormat.format(date);
     }
 
     public static Commit fromFile(String id){
@@ -58,11 +70,11 @@ public class Commit implements Serializable {
 
     public void update(String m, String head){
         message = m;
-        parent = head;
-        ZonedDateTime now = ZonedDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy x");
-        time = now.format(formatter);
-        CID = sha1(message, parent, time, Track.toString());
+        parents.clear();
+        parents.add(head);
+        date = new Date();
+        time = getTimestamp();
+        CID = generateId();
     }
 
 
@@ -104,7 +116,7 @@ public class Commit implements Serializable {
     }
 
     public String getParent() {
-        return parent;
+        return parents.get(0);
     }
 
     /* TODO: fill in the rest of this class. */

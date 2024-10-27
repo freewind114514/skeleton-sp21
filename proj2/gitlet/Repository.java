@@ -74,7 +74,7 @@ public class Repository {
         }
         Stage stage = new Stage();
         stage.save();
-        Commit initialCommit = new Commit("initial commit", null);
+        Commit initialCommit = new Commit();
         initialCommit.saveObject();
         branch("master", initialCommit.getID());
         writeObject(saveHead, join(BRANCH, "master"));
