@@ -22,7 +22,6 @@ public class Commit implements Serializable {
     private Map<String, String> Track;
     private String message;
     private Date date;
-    private boolean merge = false;
     /**
      *
      * List all instance variables of the Commit class here with a useful
@@ -91,8 +90,10 @@ public class Commit implements Serializable {
     public static void printLog(Commit c){
         System.out.println("===");
         System.out.println("commit" + " " + c.CID);
-        if (c.merge){
-            System.out.println("Merge:" + " " + c.CID);
+        if (c.parents.size() > 1){
+            System.out.println("Merge:" + " " + c.parents.get(0).substring(0, 7)
+                    + " " + c.parents.get(1).substring(0, 7));
+            System.out.println();
         }
         System.out.println("Date:" + " " + c.time);
         System.out.println(c.message);
