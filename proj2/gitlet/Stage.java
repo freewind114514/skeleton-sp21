@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,8 +13,8 @@ public class Stage implements Serializable {
     public static Map<String, byte[]> rmStage;
 
     public Stage(){
-        addStage = new HashMap<>();
-        rmStage = new HashMap<>();
+        addStage = new TreeMap<>();
+        rmStage = new TreeMap<>();
     }
 
     public Map<String, byte[]> getAddStage(){
@@ -40,8 +39,8 @@ public class Stage implements Serializable {
         return addStage.isEmpty() && rmStage.isEmpty();
     }
 
-    public boolean ifAddStageContains(String filename){
-        return addStage.containsKey(filename);
+    public boolean AddNotContains(String filename){
+        return !addStage.containsKey(filename);
     }
 
     public boolean ifRmStageContains(String filename){
@@ -70,16 +69,14 @@ public class Stage implements Serializable {
     }
 
     public void printStage(){
-        TreeMap<String, byte[]> sortedAdd = new TreeMap<>(addStage);
-        TreeMap<String, byte[]> sortedRm = new TreeMap<>(rmStage);
 
         System.out.println("=== Staged Files ===");
-        for (String key : sortedAdd.keySet()) {
+        for (String key : addStage.keySet()) {
             System.out.println(key);
         }
         System.out.println();
         System.out.println("=== Removed Files ===");
-        for (String key : sortedRm.keySet()) {
+        for (String key : rmStage.keySet()) {
             System.out.println(key);
         }
         System.out.println();

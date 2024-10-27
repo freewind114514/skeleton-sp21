@@ -36,7 +36,7 @@ public class Commit implements Serializable {
         time = "Thu Jan 1 00:00:00 1970 -0800";
         message = m;
         parent = parentID;
-        Track = new HashMap<>();
+        Track = new TreeMap<>();
         CID = sha1(message, parent, time, Track);
     }
 

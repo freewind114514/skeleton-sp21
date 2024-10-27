@@ -23,13 +23,40 @@ public class Main {
                 add(args[1]);
                 // TODO: handle the `add [filename]` command
                 break;
-            // TODO: FILL THE REST IN
+
             case "remove":
                 rm(args[1]);
                 break;
 
             case "commit":
                 commit(args[1]);
+                break;
+
+            case "log":
+                log();
+                break;
+
+            case "global-log":
+                globalLog();
+                break;
+
+            case "find":
+                find(args[1]);
+                break;
+
+            case "status":
+                status();
+                break;
+
+            case "checkout":
+                if(args[1].equals("--")){
+                    checkFile(args[2]);
+                } else if (args[2].equals("--")) {
+                    checkCommitFile(args[1], args[3]);
+                } else {
+                    checkBranch(args[1]);
+                }
+
         }
     }
 }

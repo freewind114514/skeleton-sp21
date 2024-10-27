@@ -46,7 +46,7 @@ public class Bolb implements Serializable{
         return BID;
     }
 
-    private byte[] getContent() {
+    public byte[] getContent() {
         return content;
     }
 }

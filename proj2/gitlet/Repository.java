@@ -34,10 +34,7 @@ public class Repository {
     public static String HEAD;
     public static File currentBranchHead = readObject(saveHead, File.class);
 
-    /** check the .gitlet directory.
-     * if already existed: print some error message,
-     * else initialize it
-     */
+
     public static void init() throws IOException {
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
@@ -52,8 +49,8 @@ public class Repository {
             stage.save();
             Commit initialCommit = new Commit("initial commit", null);
             initialCommit.saveObject();
-            HEAD = initialCommit.getID();
-            branch("master");
+            branch("master", initialCommit.getID());
+            writeObject(saveHead, join(BRANCH, "master"));
         }
     }
 
@@ -75,7 +72,7 @@ public class Repository {
         HEAD = readContentsAsString(currentBranchHead);
         Map<String, String> track = Commit.fromFile(HEAD).getTrack();
 
-        if (!stage.ifAddStageContains(filename) && !track.containsKey(filename)){
+        if (stage.AddNotContains(filename) && !track.containsKey(filename)){
             System.out.println("No reason to remove the file.");
             return;
         }
@@ -175,7 +172,7 @@ public class Repository {
         for (String filename : Track.keySet()){
             if (filenames.contains(filename)) {
                 String id = sha1(readContents(join(CWD, filename)));
-                if (!Track.get(filename).equals(id) && !stage.ifAddStageContains(filename)) {
+                if (!Track.get(filename).equals(id) && stage.AddNotContains(filename)) {
                     M.addLast(filename);
                 }
             }else {
@@ -211,7 +208,7 @@ public class Repository {
         Map<String, String> Track = c.getTrack();
         List<String> U = new ArrayList<>();
         for (String filename : filenames){
-            if (!stage.ifAddStageContains(filename) && !Track.keySet().contains(filename)){
+            if (stage.AddNotContains(filename) && !Track.keySet().contains(filename)){
                 U.addLast(filename);
             }
             if (stage.ifRmStageContains(filename)){
@@ -226,18 +223,60 @@ public class Repository {
         System.out.println();
     }
 
-    public static void branch(String name) throws IOException {
-        if (HEAD == null) {
-            HEAD = readContentsAsString(currentBranchHead);
+    private static void check(String CID, String filename) throws IOException {
+        Commit c = Commit.fromFile(CID);
+        Map<String, String> Track = c.getTrack();
+        if (Track.containsKey(filename)) {
+            Bolb b = readObject(join(BOLBS, Track.get(filename)), Bolb.class);
+            byte[] content = b.getContent();
+            File file = join(CWD, filename);
+            if (!file.exists()){
+                file.createNewFile();
+            }
+            writeContents(file, content);
+        } else {
+            System.out.println("File does not exist in that commit.");
         }
+    }
+
+    public static void checkFile(String filename) throws IOException {
+        HEAD = readContentsAsString(currentBranchHead);
+        check(HEAD, filename);
+    }
+
+    public static void checkCommitFile(String CID, String filename) throws IOException {
+        File commit = join(COMMIT, CID);
+        if (commit.exists()) {
+            check(CID, filename);
+        } else {
+            System.out.println("No commit with that id exists.");
+        }
+    }
+
+    public static void checkBranch(String branchName){
+
+    }
+
+    public static void branch(String name, String CID) throws IOException {
         File newBranch = join(BRANCH, name);
         if (newBranch.exists()){
             System.out.println("A branch with that name already exists.");
-            return;
+        }else {
+            newBranch.createNewFile();
+            writeContents(newBranch, CID);
         }
-        newBranch.createNewFile();
-        writeObject(saveHead, newBranch);
-        writeContents(newBranch, HEAD);
     }
+
+    public static void rmBranch(String name) {
+        File branch = join(BRANCH, name);
+        if (branch == currentBranchHead){
+            System.out.println("Cannot remove the current branch.");
+        } else {
+            if (!restrictedDelete(branch)) {
+                System.out.println("A branch with that name does not exist.");
+            }
+        }
+    }
+
     /* TODO: fill in the rest of this class. */
 }
