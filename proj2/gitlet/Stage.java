@@ -9,8 +9,8 @@ import static gitlet.Utils.*;
 
 
 public class Stage implements Serializable {
-    public static Map<String, byte[]> addStage;
-    public static Map<String, byte[]> rmStage;
+    private Map<String, byte[]> addStage;
+    private Map<String, byte[]> rmStage;
 
     public Stage(){
         addStage = new TreeMap<>();
@@ -25,14 +25,18 @@ public class Stage implements Serializable {
         return rmStage;
     }
 
+    public void addStageRemove(String filename){
+        addStage.remove(filename);
+    }
+
     public void add(String filename, byte[] content){
-        getRmStage().remove(filename);
-        getAddStage().put(filename, content);
+        rmStage.remove(filename);
+        addStage.put(filename, content);
     }
 
     public void remove(String filename){
-        getRmStage().remove(filename);
-        getAddStage().put(filename, null);
+        addStage.remove(filename);
+        rmStage.put(filename, null);
     }
 
     public boolean ifClear(){

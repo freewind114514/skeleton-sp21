@@ -83,8 +83,15 @@ public class Repository {
     public static void add(String filename){
         File file = join(CWD, filename);
         Stage stage = readObject(STAGE, Stage.class);
+        Map<String, String> Track = readObject(join(COMMIT, getHeadID()), Commit.class).getTrack();
         if (file.exists()) {
             byte[] content = readContents(file);
+            String id = sha1(content);
+            if (Track.containsValue(id)) {
+                stage.addStageRemove(filename);
+                stage.save();
+                System.exit(0);
+            }
             stage.add(filename, content);
             stage.save();
         } else{
