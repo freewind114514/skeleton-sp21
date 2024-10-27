@@ -43,8 +43,16 @@ public class Repository {
             BRANCH.mkdir();
             COMMIT.mkdir();
             BOLBS.mkdir();
-            STAGE.createNewFile();
-            saveHead.createNewFile();
+            try {
+                STAGE.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                saveHead.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             Stage stage = new Stage();
             stage.save();
             Commit initialCommit = new Commit("initial commit", null);
@@ -231,7 +239,11 @@ public class Repository {
             byte[] content = b.getContent();
             File file = join(CWD, filename);
             if (!file.exists()){
-                file.createNewFile();
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             writeContents(file, content);
         } else {
@@ -262,7 +274,11 @@ public class Repository {
         if (newBranch.exists()){
             System.out.println("A branch with that name already exists.");
         }else {
-            newBranch.createNewFile();
+            try {
+                newBranch.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             writeContents(newBranch, CID);
         }
     }
