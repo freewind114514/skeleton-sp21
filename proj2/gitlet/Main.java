@@ -12,7 +12,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // TODO: what if args is empty?
         if (args.length == 0) {
             System.out.println("No arguments provided.");
@@ -20,7 +20,11 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                init();
+                try {
+                    init();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "add":
                 add(args[1]);
@@ -53,15 +57,22 @@ public class Main {
 
             case "checkout":
                 if(args[1].equals("--")){
-                    checkFile(args[2]);
+                    try {
+                        checkFile(args[2]);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (args[2].equals("--")) {
-                    checkCommitFile(args[1], args[3]);
+                    try {
+                        checkCommitFile(args[1], args[3]);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else {
                     checkBranch(args[1]);
                 }
 
         }
 
-        Main.main(args);
     }
 }
