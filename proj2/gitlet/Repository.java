@@ -31,35 +31,53 @@ public class Repository {
     public static final File STAGE = join(GITLET_DIR, "stage");
     public static final File BRANCH = join(GITLET_DIR, "branches");
     public static final File saveHead = join(GITLET_DIR, "head");
-    public static String HEAD;
-    public static File currentBranchHead = readObject(saveHead, File.class);
+    private static String HEAD;
+    private static File currentBranchHead;
 
+    private static String getHeadID() {
+        return readContentsAsString(getCurrentBranchHead());
+    }
 
-    public static void init() {
+    private static File getCurrentBranchHead(){
+        return readObject(saveHead, File.class);
+    }
+
+    public static void checkGitlet() {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+    }
+
+    private static void gitletExists(){
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
-        } else {
-            GITLET_DIR.mkdir();
-            BRANCH.mkdir();
-            COMMIT.mkdir();
-            BOLBS.mkdir();
-            try {
-                STAGE.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                saveHead.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            Stage stage = new Stage();
-            stage.save();
-            Commit initialCommit = new Commit("initial commit", null);
-            initialCommit.saveObject();
-            branch("master", initialCommit.getID());
-            writeObject(saveHead, join(BRANCH, "master"));
+            System.exit(0);
         }
+    }
+
+    public static void init() {
+        gitletExists();
+        GITLET_DIR.mkdir();
+        BRANCH.mkdir();
+        COMMIT.mkdir();
+        BOLBS.mkdir();
+        try {
+            STAGE.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            saveHead.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Stage stage = new Stage();
+        stage.save();
+        Commit initialCommit = new Commit("initial commit", null);
+        initialCommit.saveObject();
+        branch("master", initialCommit.getID());
+        writeObject(saveHead, join(BRANCH, "master"));
     }
 
     public static void add(String filename){
@@ -77,7 +95,7 @@ public class Repository {
     public static void rm(String filename){
         Stage stage = readObject(STAGE, Stage.class);
         File file = join(CWD, filename);
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
         Map<String, String> track = Commit.fromFile(HEAD).getTrack();
 
         if (stage.AddNotContains(filename) && !track.containsKey(filename)){
@@ -97,7 +115,8 @@ public class Repository {
 
     public static void commit(String m){
         Stage stage = readObject(STAGE,Stage.class);
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
+        currentBranchHead = getCurrentBranchHead();
         Commit c = Commit.fromFile(HEAD);
         if (stage.ifClear()){
             System.out.println("No changes added to the commit.");
@@ -115,7 +134,7 @@ public class Repository {
     }
 
     public static void log(){
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         while (c != null) {
             Commit.printLog(c);
@@ -148,7 +167,8 @@ public class Repository {
 
     public static void status(){
         Stage stage = readObject(STAGE,Stage.class);
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
+        currentBranchHead = getCurrentBranchHead();
         List<String> branches = plainFilenamesIn(BRANCH);
 
         Collections.sort(branches);
@@ -170,7 +190,7 @@ public class Repository {
 
     private static void printModifiedStatus(){
         Stage stage = readObject(STAGE,Stage.class);
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         Map<String, byte[]> addStage = stage.getAddStage();
         Map<String, String> Track = c.getTrack();
@@ -211,7 +231,7 @@ public class Repository {
     private static void printUntrackedStatus(){
         List<String> filenames = plainFilenamesIn(CWD);
         Stage stage = readObject(STAGE,Stage.class);
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         Map<String, String> Track = c.getTrack();
         List<String> U = new ArrayList<>();
@@ -252,7 +272,7 @@ public class Repository {
     }
 
     public static void checkFile(String filename) {
-        HEAD = readContentsAsString(currentBranchHead);
+        HEAD = getHeadID();
         check(HEAD, filename);
     }
 
@@ -285,6 +305,7 @@ public class Repository {
 
     public static void rmBranch(String name) {
         File branch = join(BRANCH, name);
+        currentBranchHead = getCurrentBranchHead();
         if (branch == currentBranchHead){
             System.out.println("Cannot remove the current branch.");
         } else {
