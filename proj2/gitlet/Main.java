@@ -21,7 +21,7 @@ public class Main {
                 checkArgsNumber(args, 1);
                 init();
                 break;
-                
+
             case "add":
                 checkGitlet();
                 checkArgsNumber(args, 2);

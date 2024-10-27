@@ -26,13 +26,13 @@ public class Stage implements Serializable {
     }
 
     public void add(String filename, byte[] content){
-        rmStage.remove(filename);
-        addStage.put(filename, content);
+        getRmStage().remove(filename);
+        getAddStage().put(filename, content);
     }
 
     public void remove(String filename){
-        addStage.remove(filename);
-        rmStage.put(filename, null);
+        getRmStage().remove(filename);
+        getAddStage().put(filename, null);
     }
 
     public boolean ifClear(){
