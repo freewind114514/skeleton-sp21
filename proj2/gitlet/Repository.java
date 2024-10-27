@@ -35,7 +35,7 @@ public class Repository {
     public static File currentBranchHead = readObject(saveHead, File.class);
 
 
-    public static void init() throws IOException {
+    public static void init() {
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         } else {
@@ -223,7 +223,7 @@ public class Repository {
         System.out.println();
     }
 
-    private static void check(String CID, String filename) throws IOException {
+    private static void check(String CID, String filename) {
         Commit c = Commit.fromFile(CID);
         Map<String, String> Track = c.getTrack();
         if (Track.containsKey(filename)) {
@@ -239,12 +239,12 @@ public class Repository {
         }
     }
 
-    public static void checkFile(String filename) throws IOException {
+    public static void checkFile(String filename) {
         HEAD = readContentsAsString(currentBranchHead);
         check(HEAD, filename);
     }
 
-    public static void checkCommitFile(String CID, String filename) throws IOException {
+    public static void checkCommitFile(String CID, String filename) {
         File commit = join(COMMIT, CID);
         if (commit.exists()) {
             check(CID, filename);
@@ -257,7 +257,7 @@ public class Repository {
 
     }
 
-    public static void branch(String name, String CID) throws IOException {
+    public static void branch(String name, String CID) {
         File newBranch = join(BRANCH, name);
         if (newBranch.exists()){
             System.out.println("A branch with that name already exists.");

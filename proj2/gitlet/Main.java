@@ -20,11 +20,7 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                try {
-                    init();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                init();
                 break;
             case "add":
                 add(args[1]);
@@ -57,17 +53,9 @@ public class Main {
 
             case "checkout":
                 if(args[1].equals("--")){
-                    try {
-                        checkFile(args[2]);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    checkFile(args[2]);
                 } else if (args[2].equals("--")) {
-                    try {
-                        checkCommitFile(args[1], args[3]);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    checkCommitFile(args[1], args[3]);
                 } else {
                     checkBranch(args[1]);
                 }
