@@ -143,11 +143,10 @@ public class Repository {
     public static void log(){
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
-        while (!c.getParent().isEmpty()) {
+        while (c != null) {
             Commit.printLog(c);
             c = Commit.fromFile(c.getParent());
         }
-        Commit.printLog(c);
     }
 
     public static void globalLog(){
