@@ -37,7 +37,7 @@ public class Commit implements Serializable {
         message = m;
         parent = parentID;
         Track = new TreeMap<>();
-        CID = sha1(message, parent, time, Track);
+        CID = sha1(message, parent, time, Track.toString());
     }
 
     public static Commit fromFile(String id){
