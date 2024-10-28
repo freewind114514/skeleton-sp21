@@ -52,7 +52,7 @@ public class Stage implements Serializable {
     }
 
 
-    public Commit clear(Commit c){
+    public Commit clearCommit(Commit c){
         for (Map.Entry<String, byte[]> entry : addStage.entrySet()){
             String filename = entry.getKey();
             byte[] content = entry.getValue();
@@ -66,10 +66,13 @@ public class Stage implements Serializable {
             String filename = entry.getKey();
             c.rmTrack(filename);
         }
+        clear();
+        return c;
+    }
 
+    public void clear(){
         addStage.clear();
         rmStage.clear();
-        return c;
     }
 
     public void printStage(){

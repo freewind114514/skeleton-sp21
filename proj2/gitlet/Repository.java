@@ -76,7 +76,7 @@ public class Repository {
         stage.save();
         Commit initialCommit = new Commit();
         initialCommit.saveObject();
-        branch("master", initialCommit.getID());
+        setBranch("master", initialCommit.getID());
         writeObject(saveHead, join(BRANCH, "master"));
     }
 
@@ -133,7 +133,7 @@ public class Repository {
             System.out.println("Please enter a commit message.");
             return;
         }
-        c = stage.clear(c);
+        c = stage.clearCommit(c);
         stage.save();
         c.update(m, HEAD);
         c.saveObject();
@@ -284,19 +284,84 @@ public class Repository {
     }
 
     public static void checkCommitFile(String CID, String filename) {
+        ifCommitExists(CID);
+        check(CID, filename);
+    }
+
+    private static void ifCommitExists(String CID){
         File commit = join(COMMIT, CID);
-        if (commit.exists()) {
-            check(CID, filename);
-        } else {
+        if (!commit.exists()) {
             System.out.println("No commit with that id exists.");
+            System.exit(0);
         }
     }
 
     public static void checkBranch(String branchName){
-
+        checkCheckBranch(branchName);
+        String CID = readContentsAsString(join(BRANCH, branchName));
+        List<String> filenames = plainFilenamesIn(CWD);
+        Map<String, String> Track = Commit.fromFile(CID).getTrack();
+        deleteUntracked(Track, filenames);
+        checkAll(CID,Track);
+        clearSaveStage();
+        writeObject(saveHead, join(BRANCH, branchName));
     }
 
-    public static void branch(String name, String CID) {
+    private static void checkAll (String CID, Map<String, String> Track) {
+        for (String filename : Track.keySet()) {
+            check(CID, filename);
+        }
+    }
+
+    private static void clearSaveStage() {
+        Stage stage = readObject(STAGE,Stage.class);
+        stage.clear();
+        stage.save();
+    }
+
+    private static void deleteUntracked(Map<String, String> Track, List<String> filenames) {
+        for (String name : filenames) {
+            if (!Track.containsKey(name)) {
+                File file = join(CWD, name);
+                file.delete();
+            }
+        }
+    }
+
+    private static void ifUntracked(String CID, List<String> filenames) {
+        Map<String, String> Track = Commit.fromFile(CID).getTrack();
+        for (String name : filenames){
+            if (!Track.containsKey(name)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+    }
+
+    private static void checkCheckBranch(String branchName){
+        File file = join(BRANCH, branchName);
+        HEAD = getHeadID();
+        List<String> filenames = plainFilenamesIn(CWD);
+        if (file.exists()) {
+            if (file == getCurrentBranchHead()) {
+                System.out.println("No need to checkout the current branch.");
+                System.exit(0);
+            } else {
+                ifUntracked(HEAD, filenames);
+            }
+
+        } else {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+    }
+
+    public static void branch(String name) {
+        HEAD = getHeadID();
+        setBranch(name,HEAD);
+    }
+
+    private static void setBranch(String name, String CID) {
         File newBranch = join(BRANCH, name);
         if (newBranch.exists()){
             System.out.println("A branch with that name already exists.");
@@ -321,6 +386,19 @@ public class Repository {
             }
         }
     }
+
+    public static void reset(String CID){
+        ifCommitExists(CID);
+        List<String> filenames = plainFilenamesIn(CWD);
+        Map<String, String> Track = Commit.fromFile(CID).getTrack();
+        ifUntracked(getHeadID(), filenames);
+        checkAll(CID, Track);
+        writeContents(getCurrentBranchHead(), CID);
+        deleteUntracked(Track, filenames);
+        clearSaveStage();
+    }
+
+    
 
     /* TODO: fill in the rest of this class. */
 }
