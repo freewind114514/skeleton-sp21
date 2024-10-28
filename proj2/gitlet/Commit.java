@@ -117,7 +117,7 @@ public class Commit implements Serializable {
     }
 
     public String getParent() {
-        if (parents.get(0).isEmpty()){
+        if (parents.isEmpty()){
             return null;
         }
         return parents.get(0);
