@@ -67,10 +67,13 @@ public class Commit implements Serializable {
         Track.remove(filename);
     }
 
-    public void update(String m, String head){
+    public void update(String m, String head, String secondCID){
         message = m;
         parents.clear();
         parents.add(head);
+        if (secondCID != null){
+            parents.add(secondCID);
+        }
         date = new Date();
         time = getTimestamp();
         CID = generateId();

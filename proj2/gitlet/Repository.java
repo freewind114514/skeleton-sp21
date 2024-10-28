@@ -127,15 +127,15 @@ public class Repository {
         Commit c = Commit.fromFile(HEAD);
         if (stage.ifClear()){
             System.out.println("No changes added to the commit.");
-            return;
+            System.exit(0);
         }
         if (m.isBlank()) {
             System.out.println("Please enter a commit message.");
-            return;
+            System.exit(0);
         }
         c = stage.clearCommit(c);
         stage.save();
-        c.update(m, HEAD);
+        c.update(m, HEAD, null);
         c.saveObject();
         writeContents(currentBranchHead, c.getID());
     }
@@ -296,8 +296,8 @@ public class Repository {
         }
     }
 
-    public static void checkBranch(String branchName){
-        checkCheckBranch(branchName);
+    public static void checkOutBranch(String branchName){
+        checkCheckOutBranch(branchName);
         String CID = readContentsAsString(join(BRANCH, branchName));
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> Track = Commit.fromFile(CID).getTrack();
@@ -328,8 +328,7 @@ public class Repository {
         }
     }
 
-    private static void ifUntracked(String CID, List<String> filenames) {
-        Map<String, String> Track = Commit.fromFile(CID).getTrack();
+    private static void ifUntracked(Map<String, String> Track, List<String> filenames) {
         for (String name : filenames){
             if (!Track.containsKey(name)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
@@ -338,16 +337,16 @@ public class Repository {
         }
     }
 
-    private static void checkCheckBranch(String branchName){
+    private static void checkCheckOutBranch(String branchName){
         File file = join(BRANCH, branchName);
-        HEAD = getHeadID();
+        Map<String, String> Track = Commit.fromFile(getHeadID()).getTrack();
         List<String> filenames = plainFilenamesIn(CWD);
         if (file.exists()) {
             if (file == getCurrentBranchHead()) {
                 System.out.println("No need to checkout the current branch.");
                 System.exit(0);
             } else {
-                ifUntracked(HEAD, filenames);
+                ifUntracked(Track, filenames);
             }
 
         } else {
@@ -391,14 +390,74 @@ public class Repository {
         ifCommitExists(CID);
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> Track = Commit.fromFile(CID).getTrack();
-        ifUntracked(getHeadID(), filenames);
+        ifUntracked(Track, filenames);
         checkAll(CID, Track);
         writeContents(getCurrentBranchHead(), CID);
         deleteUntracked(Track, filenames);
         clearSaveStage();
     }
 
-    
+    public static void merge(String branchName) {
+        checkMerge(branchName);
+        String currentID = getHeadID();
+        String givenID = readContentsAsString(join(BRANCH, branchName));
+        Commit splitPoint = getSplitPoint(currentID, givenID);
+        Map<String, String> TrackSplit = splitPoint.getTrack();
+        Map<String, String> TrackCurrent = Commit.fromFile(currentID).getTrack();
+        Map<String, String> TrackGiven = Commit.fromFile(givenID).getTrack();
+        
+    }
+
+    private static Commit getSplitPoint(String CID1, String CID2) {
+        if (CID1.equals(CID2)) {
+            return Commit.fromFile(CID1);
+        } else if (CID1 == null) {
+            return getSplitPoint(getHeadID(), getParentString(CID2));
+        } else {
+            return getSplitPoint(getParentString(CID1), CID2);
+        }
+    }
+
+    private static String getParentString(String CID) {
+        return Commit.fromFile(CID).getParent();
+    }
+
+    private static void checkMerge(String branchName) {
+        ifStageClear();
+        ifBranchExists(branchName);
+        ifMergeItself(branchName);
+        String CID = readContentsAsString(join(BRANCH, branchName));
+        Map<String, String> Track1 = Commit.fromFile(getHeadID()).getTrack();
+        Map<String, String> Track2 = Commit.fromFile(CID).getTrack();
+        Track1.putAll(Track2);
+        ifUntracked(Track1, plainFilenamesIn(CWD));
+    }
+
+    private static void ifStageClear() {
+        Stage stage = readObject(STAGE,Stage.class);
+        if (!stage.ifClear()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+    }
+
+    private static void ifBranchExists(String branchName) {
+        if (!join(BRANCH, branchName).exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+    }
+
+    private static void ifMergeItself(String branchName) {
+        if (getCurrentBranchHead().getName().equals(branchName)) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+    }
+
+
+
+
 
     /* TODO: fill in the rest of this class. */
 }
