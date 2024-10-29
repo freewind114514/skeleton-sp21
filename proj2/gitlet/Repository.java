@@ -120,7 +120,7 @@ public class Repository {
         }
     }
 
-    public static void commit(String m){
+    private static void setCommit(String m, String secondCID){
         Stage stage = readObject(STAGE,Stage.class);
         HEAD = getHeadID();
         currentBranchHead = getCurrentBranchHead();
@@ -135,9 +135,13 @@ public class Repository {
         }
         c = stage.clearCommit(c);
         stage.save();
-        c.update(m, HEAD, null);
+        c.update(m, HEAD, secondCID);
         c.saveObject();
         writeContents(currentBranchHead, c.getID());
+    }
+
+    public static void commit (String m) {
+        setCommit(m, null);
     }
 
     public static void log(){
@@ -399,13 +403,130 @@ public class Repository {
 
     public static void merge(String branchName) {
         checkMerge(branchName);
-        String currentID = getHeadID();
-        String givenID = readContentsAsString(join(BRANCH, branchName));
-        Commit splitPoint = getSplitPoint(currentID, givenID);
+        String currentCID = getHeadID();
+        String givenCID = readContentsAsString(join(BRANCH, branchName));
+        Commit splitPoint = getSplitPoint(currentCID, givenCID);
+        ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
         Map<String, String> TrackSplit = splitPoint.getTrack();
-        Map<String, String> TrackCurrent = Commit.fromFile(currentID).getTrack();
-        Map<String, String> TrackGiven = Commit.fromFile(givenID).getTrack();
-        
+        Map<String, String> TrackCurrent = Commit.fromFile(currentCID).getTrack();
+        Map<String, String> TrackGiven = Commit.fromFile(givenCID).getTrack();
+        Stage stage = readObject(STAGE, Stage.class);
+        String currentBID;
+        String givenBID;
+        String splitBID;
+        boolean ifConflict = false;
+
+
+        for (String filename : TrackGiven.keySet()) {
+            givenBID = TrackGiven.get(filename);
+            File file = new File(filename);
+
+            if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
+                splitBID = TrackSplit.get(filename);
+                currentBID = TrackCurrent.get(filename);
+                if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
+                    stage.add(filename, Bolb.fromfile(givenBID).getContent());
+                    stage.save();
+                    check(givenCID, filename);
+                }
+
+            } else if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
+                stage.add(filename,Bolb.fromfile(givenBID).getContent());
+                check(givenCID, filename);
+
+            } else if (TrackCurrent.containsKey(filename)) {
+                currentBID = TrackCurrent.get(filename);
+                if (!currentBID.equals(givenBID)) {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(currentBID, givenBID);
+                    writeContents(file, conflictContent);
+                    byte[] content = readContents(file);
+                    stage.add(filename, content);
+                    stage.save();
+
+                }
+
+            } else if (TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
+                splitBID = TrackSplit.get(filename);
+                if (!splitBID.equals(givenBID)) {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(null, givenBID);
+                    writeContents(file, conflictContent);
+                    byte[] content = readContents(file);
+                    stage.add(filename, content);
+                    stage.save();
+
+                }
+
+            }
+
+        }
+
+        for (String filename : TrackCurrent.keySet()) {
+            currentBID = TrackCurrent.get(filename);
+            File file = new File(filename);
+            if (TrackSplit.containsKey(filename) && !TrackGiven.containsKey(filename)) {
+                splitBID = TrackSplit.get(filename);
+                if (!splitBID.equals(currentBID)) {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(currentBID, null);
+                    writeContents(file, conflictContent);
+                    byte[] content = readContents(file);
+                    stage.add(filename, content);
+                    stage.save();
+
+                }
+            }
+
+        }
+
+        for (String filename : TrackSplit.keySet()) {
+            splitBID = TrackSplit.get(filename);
+            if (TrackCurrent.containsKey(filename) && !TrackGiven.containsKey(filename)) {
+                currentBID = TrackCurrent.get(filename);
+                if (currentBID.equals(splitBID)) {
+                    stage.remove(filename);
+                    stage.save();
+                    join(CWD, filename).delete();
+                }
+            }
+        }
+
+
+        String message = "Merged " + branchName + " into " + currentCID + ".";
+        setCommit(message, givenCID);
+
+        if (ifConflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
+
+    }
+
+    private static String getConflictContent(String currentBId, String targetBId) {
+        StringBuilder contentBuilder = new StringBuilder();
+        contentBuilder.append("<<<<<<< HEAD").append("\n");
+        if (currentBId != null) {
+            Bolb currentBlob = Bolb.fromfile(currentBId);
+            contentBuilder.append(currentBlob.getContentAsString());
+        }
+        contentBuilder.append("=======").append("\n");
+        if (targetBId != null) {
+            Bolb targetBlob = Bolb.fromfile(targetBId);
+            contentBuilder.append(targetBlob.getContentAsString());
+        }
+        contentBuilder.append(">>>>>>>");
+        return contentBuilder.toString();
+    }
+
+    private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
+        if (splitID.equals(givenID)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        } else if (splitID.equals(currentID)) {
+            checkOutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
     }
 
     private static Commit getSplitPoint(String CID1, String CID2) {

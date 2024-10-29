@@ -3,6 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+
 import static gitlet.Utils.*;
 import static gitlet.Repository.*;
 
@@ -49,4 +51,9 @@ public class Bolb implements Serializable{
     public byte[] getContent() {
         return content;
     }
+
+    public String getContentAsString() {
+        return new String(content, StandardCharsets.UTF_8);
+    }
+
 }
