@@ -427,6 +427,7 @@ public class Repository {
     public static void merge(String branchName) {
         checkMerge(branchName);
         String currentCID = getHeadID();
+        String currentBranchName = getCurrentBranchHead().getName();
         String givenCID = readContentsAsString(join(BRANCH, branchName));
         Commit splitPoint = getSplitPoint(currentCID, givenCID);
         ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
@@ -516,7 +517,7 @@ public class Repository {
         }
 
 
-        String message = "Merged " + branchName + " into " + currentCID + ".";
+        String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
 
         if (ifConflict) {
