@@ -211,11 +211,11 @@ public class Repository {
             if (filenames.contains(filename)) {
                 String id = sha1(readContents(join(CWD, filename)));
                 if (!Track.get(filename).equals(id) && stage.AddNotContains(filename)) {
-                    M.add(filename);
+                    M.add(filename + " " +"(modified)");
                 }
             }else {
                 if (!stage.ifRmStageContains(filename)){
-                    M.add(filename);
+                    M.add(filename + " " +"(deleted)");
                 }
             }
         }
@@ -224,10 +224,10 @@ public class Repository {
                 String id1 = sha1(readContents(join(CWD, filename)));
                 String id2 = sha1(addStage.get(filename));
                 if (!id1.equals(id2)) {
-                    M.add(filename);
+                    M.add(filename + " " +"(modified)");
                 }
             }else {
-                M.add(filename);
+                M.add(filename + " " +"(deleted)");
             }
         }
         Collections.sort(M);

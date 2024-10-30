@@ -109,9 +109,9 @@ public class Main {
     }
 
     private static void checkoutHelper(String[] args){
-        if(args[1].equals("--") && args.length == 3){
+        if(args.length == 3 && args[1].equals("--")){
             checkFile(args[2]);
-        } else if (args[2].equals("--") && args.length == 4) {
+        } else if (args.length == 4 && args[2].equals("--")) {
             checkCommitFile(args[1], args[3]);
         } else {
             checkArgsNumber(args, 2);
