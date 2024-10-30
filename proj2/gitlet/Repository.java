@@ -360,20 +360,19 @@ public class Repository {
 
     private static void checkCheckOutBranch(String branchName){
         File file = join(BRANCH, branchName);
-        String givenCID = readContentsAsString(file);
-        Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
-        if (file.exists()) {
-            if (file == getCurrentBranchHead()) {
-                System.out.println("No need to checkout the current branch.");
-                System.exit(0);
-            } else {
-                ifOverwrite(givenTrack);
-            }
-
-        } else {
+        if (!file.exists()) {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
+        String givenCID = readContentsAsString(file);
+        Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
+        if (file == getCurrentBranchHead()) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        } else {
+            ifOverwrite(givenTrack);
+        }
+
     }
 
     public static void branch(String name) {
