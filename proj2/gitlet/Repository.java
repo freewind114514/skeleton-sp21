@@ -293,8 +293,12 @@ public class Repository {
     }
 
     private static void ifCommitExists(String CID){
+        if (CID == null) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
         File commit = join(COMMIT, CID);
-        if (CID == null || !commit.exists()) {
+        if (!commit.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
