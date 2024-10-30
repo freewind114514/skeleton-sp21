@@ -378,15 +378,17 @@ public class Repository {
     }
 
     public static void rmBranch(String name) {
-        File branch = join(BRANCH, name);
-        currentBranchHead = getCurrentBranchHead();
-        if (branch == currentBranchHead){
+        String currentBranchName = getCurrentBranchHead().getName();
+        File file = join(BRANCH, name);
+        if (name.equals(currentBranchName)){
             System.out.println("Cannot remove the current branch.");
-        } else {
-            if (!restrictedDelete(branch)) {
-                System.out.println("A branch with that name does not exist.");
-            }
+            System.exit(0);
         }
+        if (!file.exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        file.delete();
     }
 
     public static void reset(String CID){
