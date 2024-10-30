@@ -34,6 +34,10 @@ public class Stage implements Serializable {
         addStage.put(filename, content);
     }
 
+    public void pureAdd(String filename, byte[] content){
+        addStage.put(filename, content);
+    }
+
     public void remove(String filename){
         rmStage.put(filename, null);
     }

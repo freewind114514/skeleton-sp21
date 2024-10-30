@@ -449,13 +449,13 @@ public class Repository {
                 splitBID = TrackSplit.get(filename);
                 currentBID = TrackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
-                    stage.add(filename, Bolb.fromfile(givenBID).getContent());
+                    stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                     stage.save();
                     checkCommitFile(givenCID, filename);
                 }
 
             } else if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
-                stage.add(filename,Bolb.fromfile(givenBID).getContent());
+                stage.pureAdd(filename,Bolb.fromfile(givenBID).getContent());
                 checkCommitFile(givenCID, filename);
 
             } else if (TrackCurrent.containsKey(filename)) {
@@ -465,7 +465,7 @@ public class Repository {
                     String conflictContent = getConflictContent(currentBID, givenBID);
                     writeContents(file, conflictContent);
                     byte[] content = readContents(file);
-                    stage.add(filename, content);
+                    stage.pureAdd(filename, content);
                     stage.save();
 
                 }
@@ -477,7 +477,7 @@ public class Repository {
                     String conflictContent = getConflictContent(null, givenBID);
                     writeContents(file, conflictContent);
                     byte[] content = readContents(file);
-                    stage.add(filename, content);
+                    stage.pureAdd(filename, content);
                     stage.save();
 
                 }
@@ -496,7 +496,7 @@ public class Repository {
                     String conflictContent = getConflictContent(currentBID, null);
                     writeContents(file, conflictContent);
                     byte[] content = readContents(file);
-                    stage.add(filename, content);
+                    stage.pureAdd(filename, content);
                     stage.save();
 
                 }
@@ -515,6 +515,7 @@ public class Repository {
                 }
             }
         }
+        stage.save();
 
 
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
