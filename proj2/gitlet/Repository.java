@@ -331,25 +331,30 @@ public class Repository {
         }
     }
 
-    private static void ifUntracked(Map<String, String> Track, List<String> filenames) {
-        for (String name : filenames){
-            if (!Track.containsKey(name)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                System.exit(0);
+    private static void ifOverwrite(Map<String, String> Track) {
+        List<String> filenames = plainFilenamesIn(CWD);
+        Map<String, String> currentTrack = Commit.fromFile(getHeadID()).getTrack();
+        for (String name : filenames) {
+            if (!currentTrack.containsKey(name) && Track.containsKey(name)) {
+                String cwdBID = sha1(readContents(join(CWD, name)));
+                if (!Track.get(name).equals(cwdBID)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
             }
         }
     }
 
     private static void checkCheckOutBranch(String branchName){
         File file = join(BRANCH, branchName);
-        Map<String, String> Track = Commit.fromFile(getHeadID()).getTrack();
-        List<String> filenames = plainFilenamesIn(CWD);
+        String givenCID = readContentsAsString(file);
+        Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
         if (file.exists()) {
             if (file == getCurrentBranchHead()) {
                 System.out.println("No need to checkout the current branch.");
                 System.exit(0);
             } else {
-                ifUntracked(Track, filenames);
+                ifOverwrite(givenTrack);
             }
 
         } else {
@@ -395,7 +400,7 @@ public class Repository {
         ifCommitExists(CID);
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> Track = Commit.fromFile(CID).getTrack();
-        ifUntracked(Track, filenames);
+        ifOverwrite(Track);
         checkAll(CID, Track);
         writeContents(getCurrentBranchHead(), CID);
         deleteUntracked(Track, filenames);
@@ -552,7 +557,7 @@ public class Repository {
         Map<String, String> Track1 = Commit.fromFile(getHeadID()).getTrack();
         Map<String, String> Track2 = Commit.fromFile(CID).getTrack();
         Track1.putAll(Track2);
-        ifUntracked(Track1, plainFilenamesIn(CWD));
+        ifOverwrite(Track2);
     }
 
     private static void ifStageClear() {
