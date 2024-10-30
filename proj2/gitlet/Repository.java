@@ -87,13 +87,12 @@ public class Repository {
         if (file.exists()) {
             byte[] content = readContents(file);
             String id = sha1(content);
+            stage.add(filename, content);
+            stage.save();
             if (Track.containsValue(id)) {
                 stage.addStageRemove(filename);
                 stage.save();
-                System.exit(0);
             }
-            stage.add(filename, content);
-            stage.save();
         } else{
             System.out.println("File does not exist.");
         }
