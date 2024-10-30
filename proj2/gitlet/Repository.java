@@ -553,10 +553,10 @@ public class Repository {
     }
 
     private static Commit getSplitPoint(String CID1, String CID2) {
-        if (CID1.equals(CID2)) {
-            return Commit.fromFile(CID1);
-        } else if (CID1 == null) {
+        if (CID1 == null) {
             return getSplitPoint(getHeadID(), getParentString(CID2));
+        } else if (CID1.equals(CID2)) {
+            return Commit.fromFile(CID1);
         } else {
             return getSplitPoint(getParentString(CID1), CID2);
         }
