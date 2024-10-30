@@ -370,7 +370,7 @@ public class Repository {
         }
         String givenCID = readContentsAsString(file);
         Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
-        if (file == getCurrentBranchHead()) {
+        if (givenCID.equals(getHeadID())) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         } else {
