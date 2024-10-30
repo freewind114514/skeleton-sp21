@@ -28,7 +28,7 @@ public class Main {
                 add(args[1]);
                 break;
 
-            case "remove":
+            case "rm":
                 checkGitlet();
                 checkArgsNumber(args, 2);
                 rm(args[1]);
@@ -113,11 +113,9 @@ public class Main {
             checkFile(args[2]);
         } else if (args[2].equals("--") && args.length == 4) {
             checkCommitFile(args[1], args[3]);
-        } else if (args.length == 2) {
-            checkOutBranch(args[1]);
         } else {
-            System.out.println("Incorrect operands.");
-            System.exit(0);
+            checkArgsNumber(args, 2);
+            checkOutBranch(args[1]);
         }
 
     }
