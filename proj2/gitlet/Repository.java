@@ -286,20 +286,21 @@ public class Repository {
         checkCommitFile(HEAD, filename);
     }
 
-    public static void checkCommitFile(String CID, String filename) {
+    public static void checkCommitFile(String ID, String filename) {
+        String CID = shortIdCommit(ID);
         ifCommitExists(CID);
         check(CID, filename);
     }
 
     private static void ifCommitExists(String CID){
-        File commit = shortIdCommit(CID);
-        if (commit == null || !commit.exists()) {
+        File commit = join(COMMIT, CID);
+        if (CID == null || !commit.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
     }
 
-    private static File shortIdCommit(String shortId) {
+    private static String shortIdCommit(String shortId) {
         List<String> commits = plainFilenamesIn(COMMIT);
         int length = shortId.length();
         if (length < 6) {
@@ -308,7 +309,7 @@ public class Repository {
         assert commits != null;
         for (String commitId: commits) {
             if (commitId.substring(0, length).equals(shortId)) {
-                return join(COMMIT, commitId);
+                return commitId;
             }
         }
         return null;
