@@ -439,13 +439,21 @@ public class Repository {
         String givenBID;
         String splitBID;
         boolean ifConflict = false;
+        File file = join(BOLBS, "conflict");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
+        // exist in given
         for (String filename : TrackGiven.keySet()) {
             givenBID = TrackGiven.get(filename);
-            File file = new File(filename);
+
 
             if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
+                // exist in split point and current
                 splitBID = TrackSplit.get(filename);
                 currentBID = TrackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
@@ -488,7 +496,6 @@ public class Repository {
 
         for (String filename : TrackCurrent.keySet()) {
             currentBID = TrackCurrent.get(filename);
-            File file = new File(filename);
             if (TrackSplit.containsKey(filename) && !TrackGiven.containsKey(filename)) {
                 splitBID = TrackSplit.get(filename);
                 if (!splitBID.equals(currentBID)) {
@@ -515,15 +522,15 @@ public class Repository {
                 }
             }
         }
-        stage.save();
-
+        file.delete();
+        if (ifConflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
 
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
 
-        if (ifConflict) {
-            System.out.println("Encountered a merge conflict.");
-        }
+
 
     }
 
