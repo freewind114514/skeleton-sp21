@@ -96,7 +96,6 @@ public class Commit implements Serializable {
         if (c.parents.size() > 1){
             System.out.println("Merge:" + " " + c.parents.get(0).substring(0, 7)
                     + " " + c.parents.get(1).substring(0, 7));
-            System.out.println();
         }
         System.out.println("Date:" + " " + c.time);
         System.out.println(c.message);
