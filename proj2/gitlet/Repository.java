@@ -283,7 +283,7 @@ public class Repository {
 
     public static void checkFile(String filename) {
         HEAD = getHeadID();
-        check(HEAD, filename);
+        checkCommitFile(HEAD, filename);
     }
 
     public static void checkCommitFile(String CID, String filename) {
@@ -292,11 +292,26 @@ public class Repository {
     }
 
     private static void ifCommitExists(String CID){
-        File commit = join(COMMIT, CID);
-        if (!commit.exists()) {
+        File commit = shortIdCommit(CID);
+        if (commit == null || !commit.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
+    }
+
+    private static File shortIdCommit(String shortId) {
+        List<String> commits = plainFilenamesIn(COMMIT);
+        int length = shortId.length();
+        if (length < 6) {
+            return null;
+        }
+        assert commits != null;
+        for (String commitId: commits) {
+            if (commitId.substring(0, length).equals(shortId)) {
+                return join(COMMIT, commitId);
+            }
+        }
+        return null;
     }
 
     public static void checkOutBranch(String branchName){
@@ -312,7 +327,7 @@ public class Repository {
 
     private static void checkAll (String CID, Map<String, String> Track) {
         for (String filename : Track.keySet()) {
-            check(CID, filename);
+            checkCommitFile(CID, filename);
         }
     }
 
@@ -430,12 +445,12 @@ public class Repository {
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
                     stage.add(filename, Bolb.fromfile(givenBID).getContent());
                     stage.save();
-                    check(givenCID, filename);
+                    checkCommitFile(givenCID, filename);
                 }
 
             } else if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
                 stage.add(filename,Bolb.fromfile(givenBID).getContent());
-                check(givenCID, filename);
+                checkCommitFile(givenCID, filename);
 
             } else if (TrackCurrent.containsKey(filename)) {
                 currentBID = TrackCurrent.get(filename);
