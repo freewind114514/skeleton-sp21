@@ -370,7 +370,8 @@ public class Repository {
         }
         String givenCID = readContentsAsString(file);
         Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
-        if (givenCID.equals(getHeadID())) {
+        String currentBranchName = getCurrentBranchHead().getName();
+        if (branchName.equals(currentBranchName)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         } else {
@@ -401,7 +402,7 @@ public class Repository {
     public static void rmBranch(String name) {
         String currentBranchName = getCurrentBranchHead().getName();
         File file = join(BRANCH, name);
-        if (name.equals(currentBranchName)){
+        if (currentBranchName.equals(name)){
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
