@@ -424,6 +424,19 @@ public class Repository {
         clearSaveStage();
     }
 
+    private static byte[] makeContent (String stringContent) {
+        File file = join(BOLBS, "conflict");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(file, stringContent);
+        byte[] result = readContents(file);
+        file.delete();
+        return result;
+    }
+
     public static void merge(String branchName) {
         checkMerge(branchName);
         String currentCID = getHeadID();
@@ -439,12 +452,7 @@ public class Repository {
         String givenBID;
         String splitBID;
         boolean ifConflict = false;
-        File file = join(BOLBS, "conflict");
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
 
 
         // exist in given
@@ -458,8 +466,6 @@ public class Repository {
                 currentBID = TrackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
-                    stage.save();
-                    checkCommitFile(givenCID, filename);
                 }
 
             } else if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
@@ -471,10 +477,8 @@ public class Repository {
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, givenBID);
-                    writeContents(file, conflictContent);
-                    byte[] content = readContents(file);
+                    byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-                    stage.save();
 
                 }
 
@@ -483,10 +487,8 @@ public class Repository {
                 if (!splitBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(null, givenBID);
-                    writeContents(file, conflictContent);
-                    byte[] content = readContents(file);
+                    byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-                    stage.save();
 
                 }
 
@@ -501,10 +503,8 @@ public class Repository {
                 if (!splitBID.equals(currentBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, null);
-                    writeContents(file, conflictContent);
-                    byte[] content = readContents(file);
+                    byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-                    stage.save();
 
                 }
             }
@@ -517,16 +517,14 @@ public class Repository {
                 currentBID = TrackCurrent.get(filename);
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
-                    stage.save();
                     join(CWD, filename).delete();
                 }
             }
         }
-        file.delete();
         if (ifConflict) {
             System.out.println("Encountered a merge conflict.");
         }
-
+        stage.save();
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
 
