@@ -106,17 +106,17 @@ public class Repository {
 
         if (stage.AddNotContains(filename) && !track.containsKey(filename)){
             System.out.println("No reason to remove the file.");
-            return;
+            System.exit(0);
         }
 
         stage.getAddStage().remove(filename);
-        if (track.containsKey(filename)){
+        if (track.containsKey(filename)) {
             stage.remove(filename);
-            stage.save();
             if (file.exists()){
                 file.delete();
             }
         }
+        stage.save();
     }
 
     private static void setCommit(String m, String secondCID){

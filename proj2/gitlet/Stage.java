@@ -35,7 +35,6 @@ public class Stage implements Serializable {
     }
 
     public void remove(String filename){
-        addStage.remove(filename);
         rmStage.put(filename, null);
     }
 
