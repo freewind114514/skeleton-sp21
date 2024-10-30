@@ -336,11 +336,8 @@ public class Repository {
         Map<String, String> currentTrack = Commit.fromFile(getHeadID()).getTrack();
         for (String name : filenames) {
             if (!currentTrack.containsKey(name) && Track.containsKey(name)) {
-                String cwdBID = sha1(readContents(join(CWD, name)));
-                if (!Track.get(name).equals(cwdBID)) {
-                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                    System.exit(0);
-                }
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
             }
         }
     }
@@ -583,8 +580,4 @@ public class Repository {
     }
 
 
-
-
-
-    /* TODO: fill in the rest of this class. */
 }
