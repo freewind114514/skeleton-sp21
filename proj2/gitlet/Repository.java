@@ -457,30 +457,40 @@ public class Repository {
             givenBID = TrackGiven.get(filename);
 
             if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
-                // exist in split point and current
+                // exist in both three
                 splitBID = TrackSplit.get(filename);
                 currentBID = TrackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
+                    // case 1
                 }
 
+                if (!currentBID.equals(givenBID)) {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(currentBID, givenBID);
+                    byte[] content = makeContent(conflictContent);
+                    stage.pureAdd(filename, content);
+                    // case 8 in all but modified in different way
+                }
             }
+
             if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
                 stage.pureAdd(filename,Bolb.fromfile(givenBID).getContent());
                 checkCommitFile(givenCID, filename);
-
+                // case 5 only in given
             }
-            if (TrackCurrent.containsKey(filename)) {
+
+            if (!TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
                 currentBID = TrackCurrent.get(filename);
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, givenBID);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-
+                    // case 8 not in split but modified in different way
                 }
-
             }
+
             if (TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
                 splitBID = TrackSplit.get(filename);
                 if (!splitBID.equals(givenBID)) {
@@ -488,7 +498,7 @@ public class Repository {
                     String conflictContent = getConflictContent(null, givenBID);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-
+                    // case 8 delete in current and modified in given
                 }
 
             }
@@ -504,7 +514,7 @@ public class Repository {
                     String conflictContent = getConflictContent(currentBID, null);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
-
+                    // case 8 delete in given and modified in current
                 }
             }
 
@@ -517,6 +527,7 @@ public class Repository {
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
                     join(CWD, filename).delete();
+                    // case 6  delete in given but not modified in current
                 }
             }
         }
