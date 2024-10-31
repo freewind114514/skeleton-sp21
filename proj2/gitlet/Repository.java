@@ -537,7 +537,7 @@ public class Repository {
         stage.save();
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
-
+        reset(getHeadID());
     }
 
     private static String getConflictContent(String currentBId, String targetBId) {
