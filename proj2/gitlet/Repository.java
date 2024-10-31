@@ -424,29 +424,16 @@ public class Repository {
         clearSaveStage();
     }
 
-    private static byte[] makeContent (String stringContent) {
-        File file = join(BOLBS, "conflict");
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        writeContents(file, stringContent);
-        byte[] result = readContents(file);
-        file.delete();
-        return result;
-    }
-
-    private static void writeConflictFile (String filename, byte[] content) {
-        File conflictFile = join(CWD, filename);
-        if (!conflictFile.exists()) {
+    private static void writeConflictFile(String filename, String content) {
+        File file = join(CWD, filename);
+        if (!file.exists()) {
             try {
-                conflictFile.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        writeContents(conflictFile, content);
+        writeContents(file, content);
     }
 
     public static void merge(String branchName) {
@@ -481,9 +468,8 @@ public class Repository {
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, givenBID);
-                    byte[] content = makeContent(conflictContent);
-                    stage.pureAdd(filename, content);
-                    writeConflictFile(filename, content);
+                    writeConflictFile(filename, conflictContent);
+                    stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 in all but modified in different way
                 }
             }
@@ -499,9 +485,8 @@ public class Repository {
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, givenBID);
-                    byte[] content = makeContent(conflictContent);
-                    stage.pureAdd(filename, content);
-                    writeConflictFile(filename, content);
+                    writeConflictFile(filename, conflictContent);
+                    stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 not in split but modified in different way
                 }
             }
@@ -511,9 +496,8 @@ public class Repository {
                 if (!splitBID.equals(givenBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(null, givenBID);
-                    byte[] content = makeContent(conflictContent);
-                    stage.pureAdd(filename, content);
-                    writeConflictFile(filename, content);
+                    writeConflictFile(filename, conflictContent);
+                    stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 delete in current and modified in given
                 }
 
@@ -533,9 +517,8 @@ public class Repository {
                 } else {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, null);
-                    byte[] content = makeContent(conflictContent);
-                    stage.pureAdd(filename, content);
-                    writeConflictFile(filename, content);
+                    writeConflictFile(filename, conflictContent);
+                    stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 delete in given and modified in current
                 }
 
@@ -555,12 +538,12 @@ public class Repository {
         contentBuilder.append("<<<<<<< HEAD").append("\n");
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
-            contentBuilder.append(currentBlob.getContentAsString());
+            contentBuilder.append(currentBlob.getContentAsString()).append("\n");
         }
         contentBuilder.append("=======").append("\n");
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
-            contentBuilder.append(targetBlob.getContentAsString());
+            contentBuilder.append(targetBlob.getContentAsString()).append("\n");
         }
         contentBuilder.append(">>>>>>>");
         return contentBuilder.toString();
