@@ -528,6 +528,7 @@ public class Repository {
                 currentBID = TrackCurrent.get(filename);
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
+                    join(CWD, filename).delete();
                     // case 6  delete in given but not modified in current
                 } else {
                     ifConflict = true;
