@@ -453,12 +453,8 @@ public class Repository {
         String splitBID;
         boolean ifConflict = false;
 
-
-
-        // exist in given
         for (String filename : TrackGiven.keySet()) {
             givenBID = TrackGiven.get(filename);
-
 
             if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
                 // exist in split point and current
@@ -468,11 +464,13 @@ public class Repository {
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                 }
 
-            } else if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
+            }
+            if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
                 stage.pureAdd(filename,Bolb.fromfile(givenBID).getContent());
                 checkCommitFile(givenCID, filename);
 
-            } else if (TrackCurrent.containsKey(filename)) {
+            }
+            if (TrackCurrent.containsKey(filename)) {
                 currentBID = TrackCurrent.get(filename);
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
@@ -482,7 +480,8 @@ public class Repository {
 
                 }
 
-            } else if (TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
+            }
+            if (TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
                 splitBID = TrackSplit.get(filename);
                 if (!splitBID.equals(givenBID)) {
                     ifConflict = true;
@@ -527,8 +526,6 @@ public class Repository {
         stage.save();
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
-
-
 
     }
 
