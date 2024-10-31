@@ -547,12 +547,12 @@ public class Repository {
             Bolb currentBlob = Bolb.fromfile(currentBId);
             contentBuilder.append(currentBlob.getContentAsString());
         }
-        contentBuilder.append("=======").append("\n");
+        contentBuilder.append("\n").append("=======").append("\n");
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
             contentBuilder.append(targetBlob.getContentAsString());
         }
-        contentBuilder.append(">>>>>>>");
+        contentBuilder.append("\n").append(">>>>>>>");
         return contentBuilder.toString();
     }
 
