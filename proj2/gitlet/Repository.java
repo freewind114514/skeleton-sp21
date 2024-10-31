@@ -437,6 +437,18 @@ public class Repository {
         return result;
     }
 
+    private static void writeConflictFile (String filename, byte[] content) {
+        File conflictFile = join(CWD, filename);
+        if (!conflictFile.exists()) {
+            try {
+                conflictFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        writeContents(conflictFile, content);
+    }
+
     public static void merge(String branchName) {
         checkMerge(branchName);
         String currentCID = getHeadID();
@@ -457,11 +469,12 @@ public class Repository {
             givenBID = TrackGiven.get(filename);
 
             if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
-                // exist in both three
+                // exist in three
                 splitBID = TrackSplit.get(filename);
                 currentBID = TrackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
+                    checkCommitFile(givenCID, filename);
                     // case 1
                 }
 
@@ -470,6 +483,7 @@ public class Repository {
                     String conflictContent = getConflictContent(currentBID, givenBID);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
+                    writeConflictFile(filename, content);
                     // case 8 in all but modified in different way
                 }
             }
@@ -487,6 +501,7 @@ public class Repository {
                     String conflictContent = getConflictContent(currentBID, givenBID);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
+                    writeConflictFile(filename, content);
                     // case 8 not in split but modified in different way
                 }
             }
@@ -498,6 +513,7 @@ public class Repository {
                     String conflictContent = getConflictContent(null, givenBID);
                     byte[] content = makeContent(conflictContent);
                     stage.pureAdd(filename, content);
+                    writeConflictFile(filename, content);
                     // case 8 delete in current and modified in given
                 }
 
@@ -505,20 +521,6 @@ public class Repository {
 
         }
 
-        for (String filename : TrackCurrent.keySet()) {
-            currentBID = TrackCurrent.get(filename);
-            if (TrackSplit.containsKey(filename) && !TrackGiven.containsKey(filename)) {
-                splitBID = TrackSplit.get(filename);
-                if (!splitBID.equals(currentBID)) {
-                    ifConflict = true;
-                    String conflictContent = getConflictContent(currentBID, null);
-                    byte[] content = makeContent(conflictContent);
-                    stage.pureAdd(filename, content);
-                    // case 8 delete in given and modified in current
-                }
-            }
-
-        }
 
         for (String filename : TrackSplit.keySet()) {
             splitBID = TrackSplit.get(filename);
@@ -526,10 +528,18 @@ public class Repository {
                 currentBID = TrackCurrent.get(filename);
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
-                    join(CWD, filename).delete();
                     // case 6  delete in given but not modified in current
+                } else {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(currentBID, null);
+                    byte[] content = makeContent(conflictContent);
+                    stage.pureAdd(filename, content);
+                    writeConflictFile(filename, content);
+                    // case 8 delete in given and modified in current
                 }
+
             }
+
         }
         if (ifConflict) {
             System.out.println("Encountered a merge conflict.");
@@ -537,7 +547,6 @@ public class Repository {
         stage.save();
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
-        reset(getHeadID());
     }
 
     private static String getConflictContent(String currentBId, String targetBId) {
