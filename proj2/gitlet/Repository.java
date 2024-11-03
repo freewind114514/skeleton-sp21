@@ -539,15 +539,16 @@ public class Repository {
 
     private static String getConflictContent(String currentBId, String targetBId) {
         StringBuilder contentBuilder = new StringBuilder();
-        contentBuilder.append("<<<<<<< HEAD").append("%n");
+        String newLine = System.getProperty("line.separator");
+        contentBuilder.append("<<<<<<< HEAD").append(newLine);
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
-            contentBuilder.append(currentBlob.getContentAsString()).append("%n");
+            contentBuilder.append(currentBlob.getContentAsString()).append(newLine);
         }
-        contentBuilder.append("=======").append("%n");
+        contentBuilder.append("=======").append(newLine);
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
-            contentBuilder.append(targetBlob.getContentAsString()).append("%n");
+            contentBuilder.append(targetBlob.getContentAsString()).append(newLine);
         }
         contentBuilder.append(">>>>>>>");
         return contentBuilder.toString();
