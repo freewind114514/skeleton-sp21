@@ -465,13 +465,22 @@ public class Repository {
                     // case 1
                 }
 
-                if (!currentBID.equals(givenBID)) {
+                if (!currentBID.equals(givenBID) && currentBID.equals(splitBID)) {
                     ifConflict = true;
                     String conflictContent = getConflictContent(currentBID, givenBID);
                     writeConflictFile(filename, conflictContent);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 in all but modified in different way
                 }
+
+                if (!currentBID.equals(givenBID) && givenBID.equals(splitBID)) {
+                    ifConflict = true;
+                    String conflictContent = getConflictContent(currentBID, givenBID);
+                    writeConflictFile(filename, conflictContent);
+                    stage.pureAdd(filename, readContents(join(CWD, filename)));
+                    // case 8 in all but modified in different way
+                }
+
             }
 
             if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
@@ -535,15 +544,15 @@ public class Repository {
 
     private static String getConflictContent(String currentBId, String targetBId) {
         StringBuilder contentBuilder = new StringBuilder();
-        contentBuilder.append("<<<<<<< HEAD").append("\n");
+        contentBuilder.append("<<<<<<< HEAD").append("\\r\\n");
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
-            contentBuilder.append(currentBlob.getContentAsString()).append("\n");
+            contentBuilder.append(currentBlob.getContentAsString()).append("\\r\\n");
         }
-        contentBuilder.append("=======").append("\n");
+        contentBuilder.append("=======").append("\\r\\n");
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
-            contentBuilder.append(targetBlob.getContentAsString()).append("\n");
+            contentBuilder.append(targetBlob.getContentAsString()).append("\\r\\n");
         }
         contentBuilder.append(">>>>>>>");
         return contentBuilder.toString();
