@@ -110,19 +110,21 @@ public class Commit implements Serializable {
         return CID;
     }
 
-    public String getTime(){
-        return time;
-    }
 
     public String getMessage() {
         return message;
     }
 
-    public String getParent() {
+    public String getParent1() {
         if (parents.isEmpty()){
             return null;
         }
         return parents.get(0);
+    }
+
+
+    public List<String> getParents() {
+        return parents;
     }
 
     /* TODO: fill in the rest of this class. */

@@ -148,7 +148,7 @@ public class Repository {
         Commit c = Commit.fromFile(HEAD);
         while (c != null) {
             Commit.printLog(c);
-            c = Commit.fromFile(c.getParent());
+            c = Commit.fromFile(c.getParent1());
         }
     }
 
@@ -441,7 +441,7 @@ public class Repository {
         String currentCID = getHeadID();
         String currentBranchName = getCurrentBranchHead().getName();
         String givenCID = readContentsAsString(join(BRANCH, branchName));
-        Commit splitPoint = getSplitPoint(currentCID, givenCID);
+        Commit splitPoint = getSpiltPoint(branchName);
         ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
         Map<String, String> TrackSplit = splitPoint.getTrack();
         Map<String, String> TrackCurrent = Commit.fromFile(currentCID).getTrack();
@@ -539,15 +539,15 @@ public class Repository {
 
     private static String getConflictContent(String currentBId, String targetBId) {
         StringBuilder contentBuilder = new StringBuilder();
-        contentBuilder.append("<<<<<<< HEAD").append("\\r\\n");
+        contentBuilder.append("<<<<<<< HEAD").append("%n");
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
-            contentBuilder.append(currentBlob.getContentAsString()).append("\\r\\n");
+            contentBuilder.append(currentBlob.getContentAsString()).append("%n");
         }
-        contentBuilder.append("=======").append("\\r\\n");
+        contentBuilder.append("=======").append("%n");
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
-            contentBuilder.append(targetBlob.getContentAsString()).append("\\r\\n");
+            contentBuilder.append(targetBlob.getContentAsString()).append("%n");
         }
         contentBuilder.append(">>>>>>>");
         return contentBuilder.toString();
@@ -564,19 +564,45 @@ public class Repository {
         }
     }
 
-    private static Commit getSplitPoint(String CID1, String CID2) {
-        if (CID1 == null) {
-            return getSplitPoint(getHeadID(), getParentString(CID2));
-        } else if (CID1.equals(CID2)) {
-            return Commit.fromFile(CID1);
-        } else {
-            return getSplitPoint(getParentString(CID1), CID2);
+    private static Commit getSpiltPoint(String branchName) {
+        String commitId = readContentsAsString(join(BRANCH, branchName));
+        Commit commitA = Commit.fromFile(commitId);
+        Commit commitB = Commit.fromFile(getHeadID());
+        Map<String, Integer> routeA = getRouteToInit(commitA);
+        Map<String, Integer> routeB = getRouteToInit(commitB);
+        String spiltPointCommitId = "";
+        int minValue = Integer.MAX_VALUE;
+        for (String commit: routeA.keySet()) {
+            if (routeB.containsKey(commit)) {
+                if (routeB.get(commit) < minValue) {
+                    spiltPointCommitId = commit;
+                    minValue = routeB.get(commit);
+                }
+            }
         }
+        return Commit.fromFile(spiltPointCommitId);
     }
 
-    private static String getParentString(String CID) {
-        return Commit.fromFile(CID).getParent();
+    private static Map<String, Integer> getRouteToInit(Commit commit) {
+        Map<String, Integer> route = new TreeMap<>();
+        Queue<String> queue = new ArrayDeque<>();
+        queue.add(commit.getID());
+        route.put(commit.getID(), 0);
+        while (!queue.isEmpty()) {
+            String commitId = queue.poll();
+            Commit thisCommit = Commit.fromFile(commitId);
+            for (String parentCommit: thisCommit.getParents()) {
+                if (route.containsKey(parentCommit)) {
+                    break;
+                } else {
+                    queue.add(parentCommit);
+                    route.put(parentCommit, route.get(commitId) + 1);
+                }
+            }
+        }
+        return route;
     }
+
 
     private static void checkMerge(String branchName) {
         ifStageClear();
