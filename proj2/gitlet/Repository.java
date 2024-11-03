@@ -465,21 +465,16 @@ public class Repository {
                     // case 1
                 }
 
-                if (!currentBID.equals(givenBID) && currentBID.equals(splitBID)) {
-                    ifConflict = true;
-                    String conflictContent = getConflictContent(currentBID, givenBID);
-                    writeConflictFile(filename, conflictContent);
-                    stage.pureAdd(filename, readContents(join(CWD, filename)));
-                    // case 8 in all but modified in different way
+                if (!currentBID.equals(givenBID)) {
+                    if (!splitBID.equals(currentBID) && !splitBID.equals(givenBID)) {
+                        ifConflict = true;
+                        String conflictContent = getConflictContent(currentBID, givenBID);
+                        writeConflictFile(filename, conflictContent);
+                        stage.pureAdd(filename, readContents(join(CWD, filename)));
+                        // case 8 in all but modified in different way
+                    }
                 }
 
-                if (!currentBID.equals(givenBID) && givenBID.equals(splitBID)) {
-                    ifConflict = true;
-                    String conflictContent = getConflictContent(currentBID, givenBID);
-                    writeConflictFile(filename, conflictContent);
-                    stage.pureAdd(filename, readContents(join(CWD, filename)));
-                    // case 8 in all but modified in different way
-                }
 
             }
 
