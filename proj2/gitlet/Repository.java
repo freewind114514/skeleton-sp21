@@ -754,9 +754,8 @@ public class Repository {
         for (String CID : branchHistory.keySet()) {
             copyCommit(CID, join(CWD, ".gitlet"), remoteGitlet);
         }
-        changeCWD(join(CWD, ".gitlet"));
         String newBranch = remoteName + "/" + remoteBranchName;
-        File branchFile = join(getBRANCH(), newBranch);
+        File branchFile = join(CWD, ".gitlet", "branches" ,newBranch);
         if (!branchFile.exists()) {
             try {
                 branchFile.createNewFile();
