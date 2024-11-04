@@ -421,7 +421,7 @@ public class Repository {
     }
 
     private static void setBranch(String name, String CID) {
-        File file = join(getBRANCH(), name);
+        File file = join(BRANCH, name);
         if (!file.exists()) {
             try {
                 file.createNewFile();
