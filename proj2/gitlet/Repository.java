@@ -535,7 +535,7 @@ public class Repository {
 
         byte[] headContent;
         byte[] targetContent;
-        String newLine = System.lineSeparator();
+        String newLine = "\r\n";
         String head = "<<<<<<< HEAD" + newLine;
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
