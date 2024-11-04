@@ -550,7 +550,7 @@ public class Repository {
             Bolb targetBlob = Bolb.fromfile(targetBId);
             contentBuilder.append(targetBlob.getContentAsString()).append(newLine);
         }
-        contentBuilder.append(">>>>>>>");
+        contentBuilder.append(">>>>>>>").append(newLine);
         return contentBuilder.toString();
     }
 
