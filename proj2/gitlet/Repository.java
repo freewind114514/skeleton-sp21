@@ -55,8 +55,8 @@ public class Repository {
 
     private static void gitletExists() {
         if (getGIT().exists()) {
-            System.out.println("A Gitlet version-control system " +
-                    "already exists in the current directory.");
+            System.out.println("A Gitlet version-control system "
+                    + "already exists in the current directory.");
             System.exit(0);
         }
     }
@@ -390,8 +390,8 @@ public class Repository {
         Map<String, String> currentTrack = Commit.fromFile(getHeadID()).getTrack();
         for (String name : filenames) {
             if (!currentTrack.containsKey(name) && track.containsKey(name)) {
-                System.out.println("There is an untracked file in the way; " +
-                        "delete it, or add and commit it first.");
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
                 System.exit(0);
             }
         }
@@ -446,8 +446,8 @@ public class Repository {
         file.delete();
     }
 
-    public static void reset(String ID) {
-        String cid = shortIdCommit(ID);
+    public static void reset(String id) {
+        String cid = shortIdCommit(id);
         ifCommitExists(cid);
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> track = Commit.fromFile(cid).getTrack();
@@ -458,10 +458,8 @@ public class Repository {
         clearSaveStage();
     }
 
-    public static void merge(String branchName) {
-        checkMerge(branchName);
+    private static boolean mergeHelper(String branchName) {
         String currentCID = getHeadID();
-        String currentBranchName = getCurrentBranchHead().getName();
         String givenCID = readContentsAsString(join(getBRANCH(), branchName));
         Commit splitPoint = getSpiltPoint(branchName);
         ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
@@ -473,10 +471,8 @@ public class Repository {
         String givenBID;
         String splitBID;
         boolean ifConflict = false;
-
         for (String filename : trackGiven.keySet()) {
             givenBID = trackGiven.get(filename);
-
             if (trackSplit.containsKey(filename) && trackCurrent.containsKey(filename)) {
                 // exist in three
                 splitBID = trackSplit.get(filename);
@@ -495,8 +491,6 @@ public class Repository {
                         // case 8 in all but modified in different way
                     }
                 }
-
-
             }
 
             if (!trackSplit.containsKey(filename) && !trackCurrent.containsKey(filename)) {
@@ -523,11 +517,8 @@ public class Repository {
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 delete in current and modified in given
                 }
-
             }
-
         }
-
 
         for (String filename : trackSplit.keySet()) {
             splitBID = trackSplit.get(filename);
@@ -547,10 +538,22 @@ public class Repository {
             }
 
         }
+        stage.save();
+        return ifConflict;
+    }
+
+    public static void merge(String branchName) {
+        checkMerge(branchName);
+        String currentCID = getHeadID();
+        String currentBranchName = getCurrentBranchHead().getName();
+        String givenCID = readContentsAsString(join(getBRANCH(), branchName));
+        Commit splitPoint = getSpiltPoint(branchName);
+        ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
+        boolean ifConflict = mergeHelper(branchName);
+
         if (ifConflict) {
             System.out.println("Encountered a merge conflict.");
         }
-        stage.save();
         String message = "Merged " + branchName + " into " + currentBranchName + ".";
         setCommit(message, givenCID);
     }
@@ -587,7 +590,8 @@ public class Repository {
                 separateLine, targetContent, end);
     }
 
-    private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
+    private static void ifAncestor(String branchName, String splitID,
+                                   String currentID, String givenID) {
         if (splitID.equals(givenID)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
