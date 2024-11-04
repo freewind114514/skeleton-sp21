@@ -422,10 +422,12 @@ public class Repository {
 
     private static void setBranch(String name, String CID) {
         File newBranch = join(getBRANCH(), name);
-        try {
-            newBranch.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (!newBranch.exists()) {
+            try {
+                newBranch.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         writeContents(newBranch, CID);
 
