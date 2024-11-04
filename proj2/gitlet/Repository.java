@@ -539,7 +539,7 @@ public class Repository {
 
     private static String getConflictContent(String currentBId, String targetBId) {
         StringBuilder contentBuilder = new StringBuilder();
-        String newLine = System.getProperty("line.separator");
+        String newLine = System.lineSeparator();
         contentBuilder.append("<<<<<<< HEAD").append(newLine);
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
