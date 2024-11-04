@@ -424,17 +424,6 @@ public class Repository {
         clearSaveStage();
     }
 
-    private static void writeConflictFile(String filename, String content) {
-        File file = join(CWD, filename);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        writeContents(file, content);
-    }
 
     public static void merge(String branchName) {
         checkMerge(branchName);
@@ -468,8 +457,7 @@ public class Repository {
                 if (!currentBID.equals(givenBID)) {
                     if (!splitBID.equals(currentBID) && !splitBID.equals(givenBID)) {
                         ifConflict = true;
-                        String conflictContent = getConflictContent(currentBID, givenBID);
-                        writeConflictFile(filename, conflictContent);
+                        writeConflictFile(filename, currentBID, givenBID);
                         stage.pureAdd(filename, readContents(join(CWD, filename)));
                         // case 8 in all but modified in different way
                     }
@@ -488,8 +476,7 @@ public class Repository {
                 currentBID = TrackCurrent.get(filename);
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
-                    String conflictContent = getConflictContent(currentBID, givenBID);
-                    writeConflictFile(filename, conflictContent);
+                    writeConflictFile(filename, currentBID, givenBID);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 not in split but modified in different way
                 }
@@ -499,8 +486,7 @@ public class Repository {
                 splitBID = TrackSplit.get(filename);
                 if (!splitBID.equals(givenBID)) {
                     ifConflict = true;
-                    String conflictContent = getConflictContent(null, givenBID);
-                    writeConflictFile(filename, conflictContent);
+                    writeConflictFile(filename, null, givenBID);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 delete in current and modified in given
                 }
@@ -520,8 +506,7 @@ public class Repository {
                     // case 6  delete in given but not modified in current
                 } else {
                     ifConflict = true;
-                    String conflictContent = getConflictContent(currentBID, null);
-                    writeConflictFile(filename, conflictContent);
+                    writeConflictFile(filename, currentBID, null);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
                     // case 8 delete in given and modified in current
                 }
@@ -537,21 +522,34 @@ public class Repository {
         setCommit(message, givenCID);
     }
 
-    private static String getConflictContent(String currentBId, String targetBId) {
-        StringBuilder contentBuilder = new StringBuilder();
-        String newLine = System.lineSeparator();
-        contentBuilder.append("<<<<<<< HEAD").append(newLine);
+    private static void writeConflictFile(String filename, String currentBId, String targetBId) {
+        File file = join(CWD, filename);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        byte[] headContent;
+        byte[] targetContent;
+        String head = "<<<<<<< HEAD\n";
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
-            contentBuilder.append(currentBlob.getContentAsString()).append(newLine);
+            headContent = currentBlob.getContent();
+        } else {
+            headContent = new byte[0];
         }
-        contentBuilder.append("=======").append(newLine);
+        String separateLine = "=======\n";
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
-            contentBuilder.append(targetBlob.getContentAsString()).append(newLine);
+            targetContent = targetBlob.getContent();
+        } else {
+            targetContent = new byte[0];
         }
-        contentBuilder.append(">>>>>>>").append(newLine);
-        return contentBuilder.toString();
+        String end = ">>>>>>>";
+        writeContents(file, head, headContent, separateLine, targetContent, end);
     }
 
     private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
