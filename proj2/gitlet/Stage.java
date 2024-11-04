@@ -93,7 +93,7 @@ public class Stage implements Serializable {
     }
 
     public void save(){
-        writeObject(STAGE, this);
+        writeObject(getSTAGE(), this);
     }
 
 }

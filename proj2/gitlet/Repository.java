@@ -25,13 +25,13 @@ public class Repository {
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
-    public static File GITLET_DIR = join(CWD, ".gitlet");
-    public static File COMMIT = join(GITLET_DIR, "commits");
-    public static File BOLBS = join(GITLET_DIR, "bolbs");
-    public static File STAGE = join(GITLET_DIR, "stage");
-    public static File BRANCH = join(GITLET_DIR, "branches");
-    public static File saveHead = join(GITLET_DIR, "head");
-    public static File REMOTE = join(GITLET_DIR, "remotes");
+    private static File GITLET_DIR = join(CWD, ".gitlet");
+    private static File COMMIT = join(GITLET_DIR, "commits");
+    private static File BOLBS = join(GITLET_DIR, "bolbs");
+    private static File STAGE = join(GITLET_DIR, "stage");
+    private static File BRANCH = join(GITLET_DIR, "branches");
+    private static File saveHead = join(GITLET_DIR, "head");
+    private static File REMOTE = join(GITLET_DIR, "remotes");
     private static String HEAD;
     private static File currentBranchHead;
 
@@ -40,21 +40,25 @@ public class Repository {
     }
 
     private static File getCurrentBranchHead(){
-        return readObject(saveHead, File.class);
+        return readObject(getSaveHead(), File.class);
     }
 
     public static void checkGitlet() {
-        if (!GITLET_DIR.exists()) {
+        if (!getGIT().exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
     }
 
     private static void gitletExists(){
-        if (GITLET_DIR.exists()) {
+        if (getGIT().exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
         }
+    }
+
+    public static File getGIT() {
+        return GITLET_DIR;
     }
 
     public static File getCOMMIT() {
@@ -63,6 +67,22 @@ public class Repository {
 
     public static File getBOLBS() {
         return BOLBS;
+    }
+
+    public static File getSTAGE() {
+        return STAGE;
+    }
+
+    public static File getBRANCH() {
+        return BRANCH;
+    }
+
+    public static File getSaveHead() {
+        return saveHead;
+    }
+
+    public static File getREMOTE() {
+        return REMOTE;
     }
 
     public static void init() {
@@ -92,7 +112,7 @@ public class Repository {
 
     public static void add(String filename){
         File file = join(CWD, filename);
-        Stage stage = readObject(STAGE, Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         Map<String, String> Track = Commit.fromFile(getHeadID()).getTrack();
         if (file.exists()) {
             byte[] content = readContents(file);
@@ -109,7 +129,7 @@ public class Repository {
     }
 
     public static void rm(String filename){
-        Stage stage = readObject(STAGE, Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         File file = join(CWD, filename);
         HEAD = getHeadID();
         Map<String, String> track = Commit.fromFile(HEAD).getTrack();
@@ -130,7 +150,7 @@ public class Repository {
     }
 
     private static void setCommit(String m, String secondCID){
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         currentBranchHead = getCurrentBranchHead();
         Commit c = Commit.fromFile(HEAD);
@@ -163,14 +183,14 @@ public class Repository {
     }
 
     public static void globalLog(){
-        List<String> commits = plainFilenamesIn(COMMIT);
+        List<String> commits = plainFilenamesIn(getCOMMIT());
         for (String commit : commits) {
             Commit.printLog(Commit.fromFile(commit));
         }
     }
 
     public static void find(String m){
-        List<String> commits = plainFilenamesIn(COMMIT);
+        List<String> commits = plainFilenamesIn(getCOMMIT());
         boolean notfound = true;
         for (String commit : commits) {
             Commit c = Commit.fromFile(commit);
@@ -186,10 +206,10 @@ public class Repository {
     }
 
     public static void status(){
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(),Stage.class);
         HEAD = getHeadID();
         currentBranchHead = getCurrentBranchHead();
-        List<String> branches = plainFilenamesIn(BRANCH);
+        List<String> branches = plainFilenamesIn(getBRANCH());
 
         Collections.sort(branches);
         String currentBranchName = currentBranchHead.getName();
@@ -209,7 +229,7 @@ public class Repository {
     }
 
     private static void printModifiedStatus(){
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(),Stage.class);
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         Map<String, byte[]> addStage = stage.getAddStage();
@@ -250,7 +270,7 @@ public class Repository {
 
     private static void printUntrackedStatus(){
         List<String> filenames = plainFilenamesIn(CWD);
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         Map<String, String> Track = c.getTrack();
@@ -275,7 +295,7 @@ public class Repository {
         Commit c = Commit.fromFile(CID);
         Map<String, String> Track = c.getTrack();
         if (Track.containsKey(filename)) {
-            Bolb b = readObject(join(BOLBS, Track.get(filename)), Bolb.class);
+            Bolb b = readObject(join(getBOLBS(), Track.get(filename)), Bolb.class);
             byte[] content = b.getContent();
             File file = join(CWD, filename);
             if (!file.exists()){
@@ -307,7 +327,7 @@ public class Repository {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
-        File commit = join(COMMIT, CID);
+        File commit = join(getCOMMIT(), CID);
         if (!commit.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -315,7 +335,7 @@ public class Repository {
     }
 
     private static String shortIdCommit(String shortId) {
-        List<String> commits = plainFilenamesIn(COMMIT);
+        List<String> commits = plainFilenamesIn(getCOMMIT());
         int length = shortId.length();
         if (length < 6) {
             return null;
@@ -331,13 +351,13 @@ public class Repository {
 
     public static void checkOutBranch(String branchName){
         checkCheckOutBranch(branchName);
-        String CID = readContentsAsString(join(BRANCH, branchName));
+        String CID = readContentsAsString(join(getBRANCH(), branchName));
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> Track = Commit.fromFile(CID).getTrack();
         deleteUntracked(Track, filenames);
         checkAll(CID,Track);
         clearSaveStage();
-        writeObject(saveHead, join(BRANCH, branchName));
+        writeObject(getSaveHead(), join(getBRANCH(), branchName));
     }
 
     private static void checkAll (String CID, Map<String, String> Track) {
@@ -347,7 +367,7 @@ public class Repository {
     }
 
     private static void clearSaveStage() {
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(),Stage.class);
         stage.clear();
         stage.save();
     }
@@ -373,7 +393,7 @@ public class Repository {
     }
 
     private static void checkCheckOutBranch(String branchName){
-        File file = join(BRANCH, branchName);
+        File file = join(getBRANCH(), branchName);
         if (!file.exists()) {
             System.out.println("No such branch exists.");
             System.exit(0);
@@ -391,7 +411,7 @@ public class Repository {
     }
 
     public static void branch(String name) {
-        File newBranch = join(BRANCH, name);
+        File newBranch = join(getBRANCH(), name);
         if (newBranch.exists()){
             System.out.println("A branch with that name already exists.");
             System.exit(0);
@@ -401,7 +421,7 @@ public class Repository {
     }
 
     private static void setBranch(String name, String CID) {
-        File newBranch = join(BRANCH, name);
+        File newBranch = join(getBRANCH(), name);
         try {
             newBranch.createNewFile();
         } catch (IOException e) {
@@ -413,7 +433,7 @@ public class Repository {
 
     public static void rmBranch(String name) {
         String currentBranchName = getCurrentBranchHead().getName();
-        File file = join(BRANCH, name);
+        File file = join(getBRANCH(), name);
         if (currentBranchName.equals(name)){
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
@@ -441,13 +461,13 @@ public class Repository {
         checkMerge(branchName);
         String currentCID = getHeadID();
         String currentBranchName = getCurrentBranchHead().getName();
-        String givenCID = readContentsAsString(join(BRANCH, branchName));
+        String givenCID = readContentsAsString(join(getBRANCH(), branchName));
         Commit splitPoint = getSpiltPoint(branchName);
         ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
         Map<String, String> TrackSplit = splitPoint.getTrack();
         Map<String, String> TrackCurrent = Commit.fromFile(currentCID).getTrack();
         Map<String, String> TrackGiven = Commit.fromFile(givenCID).getTrack();
-        Stage stage = readObject(STAGE, Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         String currentBID;
         String givenBID;
         String splitBID;
@@ -577,7 +597,7 @@ public class Repository {
     }
 
     private static Commit getSpiltPoint(String branchName) {
-        String commitId = readContentsAsString(join(BRANCH, branchName));
+        String commitId = readContentsAsString(join(getBRANCH(), branchName));
         Commit commitA = Commit.fromFile(commitId);
         Commit commitB = Commit.fromFile(getHeadID());
         Map<String, Integer> routeA = getRouteToInit(commitA);
@@ -619,7 +639,7 @@ public class Repository {
         ifStageClear();
         ifBranchExists(branchName);
         ifMergeItself(branchName);
-        String CID = readContentsAsString(join(BRANCH, branchName));
+        String CID = readContentsAsString(join(getBRANCH(), branchName));
         Map<String, String> Track1 = Commit.fromFile(getHeadID()).getTrack();
         Map<String, String> Track2 = Commit.fromFile(CID).getTrack();
         Track1.putAll(Track2);
@@ -627,7 +647,7 @@ public class Repository {
     }
 
     private static void ifStageClear() {
-        Stage stage = readObject(STAGE,Stage.class);
+        Stage stage = readObject(getSTAGE(),Stage.class);
         if (!stage.ifClear()) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
@@ -635,7 +655,7 @@ public class Repository {
     }
 
     private static void ifBranchExists(String branchName) {
-        if (!join(BRANCH, branchName).exists()) {
+        if (!join(getBRANCH(), branchName).exists()) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
@@ -674,7 +694,7 @@ public class Repository {
     }
 
     private static void notFoundRemote(String remoteName) {
-        File remoteFile = join(REMOTE, remoteName);
+        File remoteFile = join(getREMOTE(), remoteName);
         if (!remoteFile.exists()) {
             System.out.println("Remote directory not found.");
             System.exit(0);
@@ -705,7 +725,7 @@ public class Repository {
             bolbs.put(BID, content);
         }
         changeCWD(copyTO);
-        File commitFile = join(COMMIT, CID);
+        File commitFile = join(getCOMMIT(), CID);
         if (!commitFile.exists()) {
             commit.saveObject();
             copyBolbs(bolbs);
@@ -714,7 +734,7 @@ public class Repository {
 
     private static void copyBolbs(Map<String, Bolb> bolbs) {
         for (String BID : bolbs.keySet()) {
-            File file = join(BOLBS, BID);
+            File file = join(getBOLBS(), BID);
             Bolb b = bolbs.get(BID);
             if (!file.exists()) {
                 b.saveObject();
