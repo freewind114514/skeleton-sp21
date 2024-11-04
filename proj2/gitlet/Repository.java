@@ -583,7 +583,7 @@ public class Repository {
         } else {
             targetContent = new byte[0];
         }
-        String end = ">>>>>>>";
+        String end = ">>>>>>>" + newLine;
         writeContents(file, head, headContent, separateLine, targetContent, end);
     }
 
