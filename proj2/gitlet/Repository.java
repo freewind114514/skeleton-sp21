@@ -754,16 +754,10 @@ public class Repository {
         for (String CID : branchHistory.keySet()) {
             copyCommit(CID, join(CWD, ".gitlet"), remoteGitlet);
         }
+        File file = join(BRANCH, remoteName);
+        file.mkdir();
         String newBranch = remoteName + "/" + remoteBranchName;
-        File branchFile = join(CWD, ".gitlet", "branches" ,newBranch);
-        if (!branchFile.exists()) {
-            try {
-                branchFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        writeContents(branchFile, remoteCID);
+        setBranch(newBranch, remoteCID);
     }
 
     public static void push(String remoteName, String remoteBranchName) {
