@@ -422,13 +422,6 @@ public class Repository {
 
     private static void setBranch(String name, String CID) {
         File file = join(BRANCH, name);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         writeContents(file, CID);
     }
 
