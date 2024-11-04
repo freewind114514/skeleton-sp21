@@ -402,8 +402,10 @@ public class Repository {
         Map<String, String> givenTrack = Commit.fromFile(givenCID).getTrack();
         String currentBranchName = getCurrentBranchHead().getName();
         if (branchName.equals(currentBranchName)) {
-            System.out.println("No need to checkout the current branch.");
-            System.exit(0);
+            if (readContentsAsString(file).equals(getHeadID())) {
+                System.out.println("No need to checkout the current branch.");
+                System.exit(0);
+            }
         } else {
             ifOverwrite(givenTrack);
         }
