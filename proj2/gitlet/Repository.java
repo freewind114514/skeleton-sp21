@@ -756,7 +756,8 @@ public class Repository {
         }
         changeCWD(join(CWD, ".gitlet"));
         String newBranch = remoteName + "/" + remoteBranchName;
-        setBranch(newBranch, remoteCID);
+        File branchFile = join(getBRANCH(), newBranch);
+        writeContents(branchFile, remoteCID);
     }
 
     public static void push(String remoteName, String remoteBranchName) {
