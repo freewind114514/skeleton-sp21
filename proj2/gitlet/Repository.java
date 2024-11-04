@@ -414,7 +414,6 @@ public class Repository {
     }
 
     public static void reset(String CID){
-        ifCommitExists(CID);
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> Track = Commit.fromFile(CID).getTrack();
         ifOverwrite(Track);
