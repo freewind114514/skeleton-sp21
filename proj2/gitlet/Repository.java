@@ -535,7 +535,7 @@ public class Repository {
 
         byte[] headContent;
         byte[] targetContent;
-        String newLine = "\r\n";
+        String newLine = System.getProperty("line.separator");
         String head = "<<<<<<< HEAD" + newLine;
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
@@ -604,7 +604,6 @@ public class Repository {
         return route;
     }
 
-
     private static void checkMerge(String branchName) {
         ifStageClear();
         ifBranchExists(branchName);
@@ -638,5 +637,24 @@ public class Repository {
         }
     }
 
+    public static void addRemote(String remoteName, String remoteBranchName) {
+
+    }
+
+    public static void rmRemote(String remoteName) {
+
+    }
+
+    public static void push(String remoteName, String remoteBranchName) {
+
+    }
+
+    public static void fetch(String remoteName, String remoteBranchName) {
+
+    }
+
+    public static void pull(String remoteName, String remoteBranchName) {
+
+    }
 
 }

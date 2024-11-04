@@ -93,6 +93,36 @@ public class Main {
                 merge(args[1]);
                 break;
 
+            case "add-remote":
+                checkGitlet();
+                checkArgsNumber(args, 3);
+                addRemote(args[1], args[2]);
+                break;
+
+            case "rm-remote":
+                checkGitlet();
+                checkArgsNumber(args, 2);
+                rmRemote(args[1]);
+                break;
+
+            case "push":
+                checkGitlet();
+                checkArgsNumber(args, 3);
+                push(args[1], args[2]);
+                break;
+
+            case "fetch":
+                checkGitlet();
+                checkArgsNumber(args, 3);
+                fetch(args[1], args[2]);
+                break;
+
+            case "pull":
+                checkGitlet();
+                checkArgsNumber(args, 3);
+                pull(args[1], args[2]);
+                break;
+
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);
