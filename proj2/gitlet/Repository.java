@@ -3,14 +3,16 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
 import static gitlet.Utils.*;
 
 
 /**
  * Represents a gitlet repository.
- *  does at a high level.
- *  make Track(Map<Filename, BID>) for Commit?
- *  @author freewind
+ * does at a high level.
+ * make Track(Map<Filename, BID>) for Commit?
+ *
+ * @author freewind
  */
 public class Repository {
     /**
@@ -53,7 +55,8 @@ public class Repository {
 
     private static void gitletExists() {
         if (getGIT().exists()) {
-            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.out.println("A Gitlet version-control system " +
+                    "already exists in the current directory.");
             System.exit(0);
         }
     }
@@ -387,7 +390,8 @@ public class Repository {
         Map<String, String> currentTrack = Commit.fromFile(getHeadID()).getTrack();
         for (String name : filenames) {
             if (!currentTrack.containsKey(name) && track.containsKey(name)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.out.println("There is an untracked file in the way; " +
+                        "delete it, or add and commit it first.");
                 System.exit(0);
             }
         }
@@ -579,7 +583,8 @@ public class Repository {
             targetContent = new byte[0];
         }
         String end = ">>>>>>>" + newLine;
-        writeContents(file, head, headContent, separateLine, targetContent, end);
+        writeContents(file, head, headContent,
+                separateLine, targetContent, end);
     }
 
     private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
