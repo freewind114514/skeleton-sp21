@@ -4,68 +4,68 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static gitlet.Repository.*;
-import static gitlet.Utils.*;
+import static gitlet.Repository.getSTAGE;
+import static gitlet.Utils.writeObject;
 
 
 public class Stage implements Serializable {
     private Map<String, byte[]> addStage;
     private Map<String, byte[]> rmStage;
 
-    public Stage(){
+    public Stage() {
         addStage = new TreeMap<>();
         rmStage = new TreeMap<>();
     }
 
-    public Map<String, byte[]> getAddStage(){
+    public Map<String, byte[]> getAddStage() {
         return addStage;
     }
 
-    public Map<String, byte[]> getRmStage(){
+    public Map<String, byte[]> getRmStage() {
         return rmStage;
     }
 
-    public void addStageRemove(String filename){
+    public void addStageRemove(String filename) {
         addStage.remove(filename);
     }
 
-    public void add(String filename, byte[] content){
+    public void add(String filename, byte[] content) {
         rmStage.remove(filename);
         addStage.put(filename, content);
     }
 
-    public void pureAdd(String filename, byte[] content){
+    public void pureAdd(String filename, byte[] content) {
         addStage.put(filename, content);
     }
 
-    public void remove(String filename){
+    public void remove(String filename) {
         rmStage.put(filename, null);
     }
 
-    public boolean ifClear(){
+    public boolean ifClear() {
         return addStage.isEmpty() && rmStage.isEmpty();
     }
 
-    public boolean AddNotContains(String filename){
+    public boolean addNotContains(String filename) {
         return !addStage.containsKey(filename);
     }
 
-    public boolean ifRmStageContains(String filename){
+    public boolean ifRmStageContains(String filename) {
         return rmStage.containsKey(filename);
     }
 
 
-    public Commit clearCommit(Commit c){
-        for (Map.Entry<String, byte[]> entry : addStage.entrySet()){
+    public Commit clearCommit(Commit c) {
+        for (Map.Entry<String, byte[]> entry : addStage.entrySet()) {
             String filename = entry.getKey();
             byte[] content = entry.getValue();
             Bolb b = new Bolb(filename, content);
-            String BID = b.getBID();
-            c.addTrack(filename, BID);
+            String bid = b.getBID();
+            c.addTrack(filename, bid);
             b.saveObject();
         }
 
-        for (Map.Entry<String, byte[]> entry : rmStage.entrySet()){
+        for (Map.Entry<String, byte[]> entry : rmStage.entrySet()) {
             String filename = entry.getKey();
             c.rmTrack(filename);
         }
@@ -73,12 +73,12 @@ public class Stage implements Serializable {
         return c;
     }
 
-    public void clear(){
+    public void clear() {
         addStage.clear();
         rmStage.clear();
     }
 
-    public void printStage(){
+    public void printStage() {
 
         System.out.println("=== Staged Files ===");
         for (String key : addStage.keySet()) {
@@ -92,7 +92,7 @@ public class Stage implements Serializable {
         System.out.println();
     }
 
-    public void save(){
+    public void save() {
         writeObject(getSTAGE(), this);
     }
 

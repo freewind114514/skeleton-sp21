@@ -5,26 +5,25 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import static gitlet.Utils.*;
-import static gitlet.Repository.*;
 
 /**
  * save contents of commit as BID
  * different version of Filename.
- *
+ * <p>
  * never change?
  */
-public class Bolb implements Serializable{
+public class Bolb implements Serializable {
     private String BID;
-    private String Filename;
+    private String filename;
     private byte[] content;
 
-    public Bolb(String filename, byte[] c){
-        Filename = filename;
+    public Bolb(String filename, byte[] c) {
+        filename = filename;
         content = c;
         BID = sha1(content);
     }
 
-    public void saveObject(){
+    public void saveObject() {
         File object = join(Repository.getBOLBS(), BID);
         try {
             object.createNewFile();
@@ -34,16 +33,16 @@ public class Bolb implements Serializable{
         writeObject(object, this);
     }
 
-    public static Bolb fromfile(String bid){
+    public static Bolb fromfile(String bid) {
         File object = join(Repository.getBOLBS(), bid);
         return readObject(object, Bolb.class);
     }
 
-    private String getFilename(){
-        return Filename;
+    private String getFilename() {
+        return filename;
     }
 
-    public String getBID(){
+    public String getBID() {
         return BID;
     }
 

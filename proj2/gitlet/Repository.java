@@ -3,28 +3,29 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
 
-/** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
+/**
+ * Represents a gitlet repository.
  *  does at a high level.
  *  make Track(Map<Filename, BID>) for Commit?
  *  @author freewind
  */
 public class Repository {
     /**
-     * TODO: add instance variables here.
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     private static File GITLET_DIR = join(CWD, ".gitlet");
     private static File COMMIT = join(GITLET_DIR, "commits");
     private static File BOLBS = join(GITLET_DIR, "bolbs");
@@ -39,7 +40,7 @@ public class Repository {
         return readContentsAsString(getCurrentBranchHead());
     }
 
-    private static File getCurrentBranchHead(){
+    private static File getCurrentBranchHead() {
         return readObject(getSaveHead(), File.class);
     }
 
@@ -50,7 +51,7 @@ public class Repository {
         }
     }
 
-    private static void gitletExists(){
+    private static void gitletExists() {
         if (getGIT().exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             System.exit(0);
@@ -110,31 +111,31 @@ public class Repository {
         writeObject(saveHead, join(BRANCH, "master"));
     }
 
-    public static void add(String filename){
+    public static void add(String filename) {
         File file = join(CWD, filename);
         Stage stage = readObject(getSTAGE(), Stage.class);
-        Map<String, String> Track = Commit.fromFile(getHeadID()).getTrack();
+        Map<String, String> track = Commit.fromFile(getHeadID()).getTrack();
         if (file.exists()) {
             byte[] content = readContents(file);
             String id = sha1(content);
             stage.add(filename, content);
             stage.save();
-            if (Track.containsKey(filename) && Track.get(filename).equals(id)) {
+            if (track.containsKey(filename) && track.get(filename).equals(id)) {
                 stage.addStageRemove(filename);
                 stage.save();
             }
-        } else{
+        } else {
             System.out.println("File does not exist.");
         }
     }
 
-    public static void rm(String filename){
+    public static void rm(String filename) {
         Stage stage = readObject(getSTAGE(), Stage.class);
         File file = join(CWD, filename);
         HEAD = getHeadID();
         Map<String, String> track = Commit.fromFile(HEAD).getTrack();
 
-        if (stage.AddNotContains(filename) && !track.containsKey(filename)){
+        if (stage.addNotContains(filename) && !track.containsKey(filename)) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         }
@@ -142,19 +143,19 @@ public class Repository {
         stage.getAddStage().remove(filename);
         if (track.containsKey(filename)) {
             stage.remove(filename);
-            if (file.exists()){
+            if (file.exists()) {
                 file.delete();
             }
         }
         stage.save();
     }
 
-    private static void setCommit(String m, String secondCID){
+    private static void setCommit(String m, String secondCID) {
         Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         currentBranchHead = getCurrentBranchHead();
         Commit c = Commit.fromFile(HEAD);
-        if (stage.ifClear()){
+        if (stage.ifClear()) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
@@ -169,11 +170,11 @@ public class Repository {
         writeContents(currentBranchHead, c.getID());
     }
 
-    public static void commit (String m) {
+    public static void commit(String m) {
         setCommit(m, null);
     }
 
-    public static void log(){
+    public static void log() {
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         while (c != null) {
@@ -182,14 +183,14 @@ public class Repository {
         }
     }
 
-    public static void globalLog(){
+    public static void globalLog() {
         List<String> commits = plainFilenamesIn(getCOMMIT());
         for (String commit : commits) {
             Commit.printLog(Commit.fromFile(commit));
         }
     }
 
-    public static void find(String m){
+    public static void find(String m) {
         List<String> commits = plainFilenamesIn(getCOMMIT());
         boolean notfound = true;
         for (String commit : commits) {
@@ -200,13 +201,13 @@ public class Repository {
                 notfound = false;
             }
         }
-        if (notfound){
+        if (notfound) {
             System.out.println("Found no commit with that message.");
         }
     }
 
-    public static void status(){
-        Stage stage = readObject(getSTAGE(),Stage.class);
+    public static void status() {
+        Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         currentBranchHead = getCurrentBranchHead();
         List<String> branches = plainFilenamesIn(getBRANCH());
@@ -216,9 +217,9 @@ public class Repository {
 
         System.out.println("=== Branches ===");
         for (String str : branches) {
-            if (Objects.equals(str, currentBranchName)){
+            if (Objects.equals(str, currentBranchName)) {
                 System.out.println("*" + currentBranchName);
-            }else {
+            } else {
                 System.out.println(str);
             }
         }
@@ -228,77 +229,77 @@ public class Repository {
         printUntrackedStatus();
     }
 
-    private static void printModifiedStatus(){
-        Stage stage = readObject(getSTAGE(),Stage.class);
+    private static void printModifiedStatus() {
+        Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
         Map<String, byte[]> addStage = stage.getAddStage();
-        Map<String, String> Track = c.getTrack();
+        Map<String, String> track = c.getTrack();
         List<String> filenames = plainFilenamesIn(CWD);
         List<String> M = new ArrayList<>();
 
-        for (String filename : Track.keySet()){
+        for (String filename : track.keySet()) {
             if (filenames.contains(filename)) {
                 String id = sha1(readContents(join(CWD, filename)));
-                if (!Track.get(filename).equals(id) && stage.AddNotContains(filename)) {
-                    M.add(filename + " " +"(modified)");
+                if (!track.get(filename).equals(id) && stage.addNotContains(filename)) {
+                    M.add(filename + " " + "(modified)");
                 }
-            }else {
-                if (!stage.ifRmStageContains(filename)){
-                    M.add(filename + " " +"(deleted)");
+            } else {
+                if (!stage.ifRmStageContains(filename)) {
+                    M.add(filename + " " + "(deleted)");
                 }
             }
         }
-        for (String filename : addStage.keySet()){
-            if (filenames.contains(filename)){
+        for (String filename : addStage.keySet()) {
+            if (filenames.contains(filename)) {
                 String id1 = sha1(readContents(join(CWD, filename)));
                 String id2 = sha1(addStage.get(filename));
                 if (!id1.equals(id2)) {
-                    M.add(filename + " " +"(modified)");
+                    M.add(filename + " " + "(modified)");
                 }
-            }else {
-                M.add(filename + " " +"(deleted)");
+            } else {
+                M.add(filename + " " + "(deleted)");
             }
         }
         Collections.sort(M);
         System.out.println("=== Modifications Not Staged For Commit ===");
-        for (String str : M){
+        for (String str : M) {
             System.out.println(str);
         }
         System.out.println();
     }
 
-    private static void printUntrackedStatus(){
+    private static void printUntrackedStatus() {
         List<String> filenames = plainFilenamesIn(CWD);
         Stage stage = readObject(getSTAGE(), Stage.class);
         HEAD = getHeadID();
         Commit c = Commit.fromFile(HEAD);
-        Map<String, String> Track = c.getTrack();
+        Map<String, String> track = c.getTrack();
         List<String> U = new ArrayList<>();
-        for (String filename : filenames){
-            if (stage.AddNotContains(filename) && !Track.keySet().contains(filename)){
+        for (String filename : filenames) {
+            if (stage.addNotContains(filename) && !track.keySet().contains(filename)) {
                 U.add(filename);
             }
-            if (stage.ifRmStageContains(filename)){
+            if (stage.ifRmStageContains(filename)) {
                 U.add(filename);
             }
         }
         Collections.sort(U);
         System.out.println("=== Untracked Files ===");
-        for (String str : U){
+        for (String str : U) {
             System.out.println(str);
         }
         System.out.println();
     }
 
-    private static void check(String CID, String filename) {
-        Commit c = Commit.fromFile(CID);
-        Map<String, String> Track = c.getTrack();
-        if (Track.containsKey(filename)) {
-            Bolb b = readObject(join(getBOLBS(), Track.get(filename)), Bolb.class);
+    private static void check(String cid, String filename) {
+        Commit c = Commit.fromFile(cid);
+        Map<String, String> track = c.getTrack();
+        if (track.containsKey(filename)) {
+            Bolb b = readObject(join(getBOLBS(), track.get(filename)), Bolb.class);
             byte[] content = b.getContent();
             File file = join(CWD, filename);
-            if (!file.exists()){
+            if (!file.exists()) {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
@@ -316,18 +317,18 @@ public class Repository {
         checkCommitFile(HEAD, filename);
     }
 
-    public static void checkCommitFile(String ID, String filename) {
-        String CID = shortIdCommit(ID);
-        ifCommitExists(CID);
-        check(CID, filename);
+    public static void checkCommitFile(String id, String filename) {
+        String cid = shortIdCommit(id);
+        ifCommitExists(cid);
+        check(cid, filename);
     }
 
-    private static void ifCommitExists(String CID){
-        if (CID == null) {
+    private static void ifCommitExists(String cid) {
+        if (cid == null) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
-        File commit = join(getCOMMIT(), CID);
+        File commit = join(getCOMMIT(), cid);
         if (!commit.exists()) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
@@ -341,7 +342,7 @@ public class Repository {
             return null;
         }
         assert commits != null;
-        for (String commitId: commits) {
+        for (String commitId : commits) {
             if (commitId.substring(0, length).equals(shortId)) {
                 return commitId;
             }
@@ -349,50 +350,50 @@ public class Repository {
         return null;
     }
 
-    public static void checkOutBranch(String branchName){
+    public static void checkOutBranch(String branchName) {
         checkCheckOutBranch(branchName);
-        String CID = readContentsAsString(join(getBRANCH(), branchName));
+        String cid = readContentsAsString(join(getBRANCH(), branchName));
         List<String> filenames = plainFilenamesIn(CWD);
-        Map<String, String> Track = Commit.fromFile(CID).getTrack();
-        deleteUntracked(Track, filenames);
-        checkAll(CID,Track);
+        Map<String, String> track = Commit.fromFile(cid).getTrack();
+        deleteUntracked(track, filenames);
+        checkAll(cid, track);
         clearSaveStage();
         writeObject(getSaveHead(), join(getBRANCH(), branchName));
     }
 
-    private static void checkAll (String CID, Map<String, String> Track) {
-        for (String filename : Track.keySet()) {
-            checkCommitFile(CID, filename);
+    private static void checkAll(String cid, Map<String, String> track) {
+        for (String filename : track.keySet()) {
+            checkCommitFile(cid, filename);
         }
     }
 
     private static void clearSaveStage() {
-        Stage stage = readObject(getSTAGE(),Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         stage.clear();
         stage.save();
     }
 
-    private static void deleteUntracked(Map<String, String> Track, List<String> filenames) {
+    private static void deleteUntracked(Map<String, String> track, List<String> filenames) {
         for (String name : filenames) {
-            if (!Track.containsKey(name)) {
+            if (!track.containsKey(name)) {
                 File file = join(CWD, name);
                 file.delete();
             }
         }
     }
 
-    private static void ifOverwrite(Map<String, String> Track) {
+    private static void ifOverwrite(Map<String, String> track) {
         List<String> filenames = plainFilenamesIn(CWD);
         Map<String, String> currentTrack = Commit.fromFile(getHeadID()).getTrack();
         for (String name : filenames) {
-            if (!currentTrack.containsKey(name) && Track.containsKey(name)) {
+            if (!currentTrack.containsKey(name) && track.containsKey(name)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
         }
     }
 
-    private static void checkCheckOutBranch(String branchName){
+    private static void checkCheckOutBranch(String branchName) {
         File file = join(getBRANCH(), branchName);
         if (!file.exists()) {
             System.out.println("No such branch exists.");
@@ -414,7 +415,7 @@ public class Repository {
 
     public static void branch(String name) {
         File newBranch = join(getBRANCH(), name);
-        if (newBranch.exists()){
+        if (newBranch.exists()) {
             System.out.println("A branch with that name already exists.");
             System.exit(0);
         }
@@ -422,15 +423,15 @@ public class Repository {
         setBranch(name, HEAD);
     }
 
-    private static void setBranch(String name, String CID) {
+    private static void setBranch(String name, String cid) {
         File file = join(BRANCH, name);
-        writeContents(file, CID);
+        writeContents(file, cid);
     }
 
     public static void rmBranch(String name) {
         String currentBranchName = getCurrentBranchHead().getName();
         File file = join(getBRANCH(), name);
-        if (currentBranchName.equals(name)){
+        if (currentBranchName.equals(name)) {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
@@ -441,15 +442,15 @@ public class Repository {
         file.delete();
     }
 
-    public static void reset(String ID){
-        String CID = shortIdCommit(ID);
-        ifCommitExists(CID);
+    public static void reset(String ID) {
+        String cid = shortIdCommit(ID);
+        ifCommitExists(cid);
         List<String> filenames = plainFilenamesIn(CWD);
-        Map<String, String> Track = Commit.fromFile(CID).getTrack();
-        ifOverwrite(Track);
-        checkAll(CID, Track);
-        writeContents(getCurrentBranchHead(), CID);
-        deleteUntracked(Track, filenames);
+        Map<String, String> track = Commit.fromFile(cid).getTrack();
+        ifOverwrite(track);
+        checkAll(cid, track);
+        writeContents(getCurrentBranchHead(), cid);
+        deleteUntracked(track, filenames);
         clearSaveStage();
     }
 
@@ -460,23 +461,23 @@ public class Repository {
         String givenCID = readContentsAsString(join(getBRANCH(), branchName));
         Commit splitPoint = getSpiltPoint(branchName);
         ifAncestor(branchName, splitPoint.getID(), currentCID, givenCID);
-        Map<String, String> TrackSplit = splitPoint.getTrack();
-        Map<String, String> TrackCurrent = Commit.fromFile(currentCID).getTrack();
-        Map<String, String> TrackGiven = Commit.fromFile(givenCID).getTrack();
+        Map<String, String> trackSplit = splitPoint.getTrack();
+        Map<String, String> trackCurrent = Commit.fromFile(currentCID).getTrack();
+        Map<String, String> trackGiven = Commit.fromFile(givenCID).getTrack();
         Stage stage = readObject(getSTAGE(), Stage.class);
         String currentBID;
         String givenBID;
         String splitBID;
         boolean ifConflict = false;
 
-        for (String filename : TrackGiven.keySet()) {
-            givenBID = TrackGiven.get(filename);
+        for (String filename : trackGiven.keySet()) {
+            givenBID = trackGiven.get(filename);
 
-            if (TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
+            if (trackSplit.containsKey(filename) && trackCurrent.containsKey(filename)) {
                 // exist in three
-                splitBID = TrackSplit.get(filename);
-                currentBID = TrackCurrent.get(filename);
-                if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)){
+                splitBID = trackSplit.get(filename);
+                currentBID = trackCurrent.get(filename);
+                if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)) {
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                     checkCommitFile(givenCID, filename);
                     // case 1
@@ -494,14 +495,14 @@ public class Repository {
 
             }
 
-            if (!TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
-                stage.pureAdd(filename,Bolb.fromfile(givenBID).getContent());
+            if (!trackSplit.containsKey(filename) && !trackCurrent.containsKey(filename)) {
+                stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                 checkCommitFile(givenCID, filename);
                 // case 5 only in given
             }
 
-            if (!TrackSplit.containsKey(filename) && TrackCurrent.containsKey(filename)) {
-                currentBID = TrackCurrent.get(filename);
+            if (!trackSplit.containsKey(filename) && trackCurrent.containsKey(filename)) {
+                currentBID = trackCurrent.get(filename);
                 if (!currentBID.equals(givenBID)) {
                     ifConflict = true;
                     writeConflictFile(filename, currentBID, givenBID);
@@ -510,8 +511,8 @@ public class Repository {
                 }
             }
 
-            if (TrackSplit.containsKey(filename) && !TrackCurrent.containsKey(filename)) {
-                splitBID = TrackSplit.get(filename);
+            if (trackSplit.containsKey(filename) && !trackCurrent.containsKey(filename)) {
+                splitBID = trackSplit.get(filename);
                 if (!splitBID.equals(givenBID)) {
                     ifConflict = true;
                     writeConflictFile(filename, null, givenBID);
@@ -524,10 +525,10 @@ public class Repository {
         }
 
 
-        for (String filename : TrackSplit.keySet()) {
-            splitBID = TrackSplit.get(filename);
-            if (TrackCurrent.containsKey(filename) && !TrackGiven.containsKey(filename)) {
-                currentBID = TrackCurrent.get(filename);
+        for (String filename : trackSplit.keySet()) {
+            splitBID = trackSplit.get(filename);
+            if (trackCurrent.containsKey(filename) && !trackGiven.containsKey(filename)) {
+                currentBID = trackCurrent.get(filename);
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
                     join(CWD, filename).delete();
@@ -600,7 +601,7 @@ public class Repository {
         Map<String, Integer> routeB = getRouteToInit(commitB);
         String spiltPointCommitId = "";
         int minValue = Integer.MAX_VALUE;
-        for (String commit: routeA.keySet()) {
+        for (String commit : routeA.keySet()) {
             if (routeB.containsKey(commit)) {
                 if (routeB.get(commit) < minValue) {
                     spiltPointCommitId = commit;
@@ -619,7 +620,7 @@ public class Repository {
         while (!queue.isEmpty()) {
             String commitId = queue.poll();
             Commit thisCommit = Commit.fromFile(commitId);
-            for (String parentCommit: thisCommit.getParents()) {
+            for (String parentCommit : thisCommit.getParents()) {
                 if (route.containsKey(parentCommit)) {
                     break;
                 } else {
@@ -635,15 +636,15 @@ public class Repository {
         ifStageClear();
         ifBranchExists(branchName);
         ifMergeItself(branchName);
-        String CID = readContentsAsString(join(getBRANCH(), branchName));
-        Map<String, String> Track1 = Commit.fromFile(getHeadID()).getTrack();
-        Map<String, String> Track2 = Commit.fromFile(CID).getTrack();
-        Track1.putAll(Track2);
-        ifOverwrite(Track2);
+        String cid = readContentsAsString(join(getBRANCH(), branchName));
+        Map<String, String> track1 = Commit.fromFile(getHeadID()).getTrack();
+        Map<String, String> track2 = Commit.fromFile(cid).getTrack();
+        track1.putAll(track2);
+        ifOverwrite(track2);
     }
 
     private static void ifStageClear() {
-        Stage stage = readObject(getSTAGE(),Stage.class);
+        Stage stage = readObject(getSTAGE(), Stage.class);
         if (!stage.ifClear()) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
@@ -712,16 +713,16 @@ public class Repository {
         REMOTE = join(file, "remotes");
     }
 
-    private static void copyCommit(String CID, File copyTO, File copyFrom) {
+    private static void copyCommit(String cid, File copyTO, File copyFrom) {
         changeCWD(copyFrom);
-        Commit commit = Commit.fromFile(CID);
+        Commit commit = Commit.fromFile(cid);
         Map<String, Bolb> bolbs = new TreeMap<>();
-        for (String BID : commit.getTrack().values()) {
-            Bolb content = Bolb.fromfile(BID);
-            bolbs.put(BID, content);
+        for (String bid : commit.getTrack().values()) {
+            Bolb content = Bolb.fromfile(bid);
+            bolbs.put(bid, content);
         }
         changeCWD(copyTO);
-        File commitFile = join(getCOMMIT(), CID);
+        File commitFile = join(getCOMMIT(), cid);
         if (!commitFile.exists()) {
             commit.saveObject();
             copyBolbs(bolbs);
@@ -729,9 +730,9 @@ public class Repository {
     }
 
     private static void copyBolbs(Map<String, Bolb> bolbs) {
-        for (String BID : bolbs.keySet()) {
-            File file = join(getBOLBS(), BID);
-            Bolb b = bolbs.get(BID);
+        for (String bid : bolbs.keySet()) {
+            File file = join(getBOLBS(), bid);
+            Bolb b = bolbs.get(bid);
             if (!file.exists()) {
                 b.saveObject();
             }
@@ -753,8 +754,8 @@ public class Repository {
         Map<String, Integer> branchHistory = getRouteToInit(remoteCommit);
         changeCWD(join(CWD, ".gitlet"));
         // work back CWD and copy all
-        for (String CID : branchHistory.keySet()) {
-            copyCommit(CID, join(CWD, ".gitlet"), remoteGitlet);
+        for (String cid : branchHistory.keySet()) {
+            copyCommit(cid, join(CWD, ".gitlet"), remoteGitlet);
         }
         File file = join(BRANCH, remoteName);
         file.mkdir();
@@ -776,8 +777,8 @@ public class Repository {
             System.out.println("Please pull down remote changes before pushing.");
             System.exit(0);
         }
-        for (String CID : currentHistory.keySet()) {
-            copyCommit(CID, remoteGitlet, join(CWD, ".gitlet"));
+        for (String cid : currentHistory.keySet()) {
+            copyCommit(cid, remoteGitlet, join(CWD, ".gitlet"));
         }
         // get CWD head and point remote head to target commit
         changeCWD(join(CWD, ".gitlet"));

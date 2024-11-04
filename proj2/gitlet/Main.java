@@ -2,13 +2,16 @@ package gitlet;
 
 import static gitlet.Repository.*;
 
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *
+ * @author freewind
  */
 public class Main {
 
-    /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+    /**
+     * Usage: java gitlet.Main ARGS, where ARGS contains
+     * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -16,7 +19,7 @@ public class Main {
             System.exit(0);
         }
 
-        switch(args[0]) {
+        switch (args[0]) {
             case "init":
                 checkArgsNumber(args, 1);
                 init();
@@ -138,8 +141,8 @@ public class Main {
         }
     }
 
-    private static void checkoutHelper(String[] args){
-        if(args.length == 3 && args[1].equals("--")){
+    private static void checkoutHelper(String[] args) {
+        if (args.length == 3 && args[1].equals("--")) {
             checkFile(args[2]);
         } else if (args.length == 4 && args[2].equals("--")) {
             checkCommitFile(args[1], args[3]);
