@@ -584,7 +584,7 @@ public class Repository {
             targetContent = new byte[0];
         }
         String end = ">>>>>>>";
-        writeContents(file, head, headContent, newLine, separateLine, targetContent, newLine, end);
+        writeContents(file, head, headContent, separateLine, targetContent, end);
     }
 
     private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
