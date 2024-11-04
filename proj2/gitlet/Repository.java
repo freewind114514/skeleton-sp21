@@ -707,7 +707,7 @@ public class Repository {
     }
 
     private static void changeCWD(File file) {
-        GITLET_DIR = join(file, ".gitlet");
+        GITLET_DIR = file;
         COMMIT = join(GITLET_DIR, "commits");
         BOLBS = join(GITLET_DIR, "bolbs");
         STAGE = join(GITLET_DIR, "stage");
@@ -755,10 +755,10 @@ public class Repository {
         // work in remote .gitlet now
         Commit remoteCommit = Commit.fromFile(remoteCID);
         Map<String, Integer> branchHistory = getRouteToInit(remoteCommit);
-        changeCWD(CWD);
+        changeCWD(join(CWD, ".gitlet"));
         // work back CWD and copy all
         for (String CID : branchHistory.keySet()) {
-            copyCommit(CID, CWD, remoteGitlet);
+            copyCommit(CID, join(CWD, ".gitlet"), remoteGitlet);
         }
         String newBranch = remoteName + "/" + remoteBranchName;
         setBranch(newBranch, remoteCID);
@@ -779,10 +779,10 @@ public class Repository {
             System.exit(0);
         }
         for (String CID : currentHistory.keySet()) {
-            copyCommit(CID, remoteGitlet, CWD);
+            copyCommit(CID, remoteGitlet, join(CWD, ".gitlet"));
         }
         // get CWD head and point remote head to target commit
-        changeCWD(CWD);
+        changeCWD(join(CWD, ".gitlet"));
         String headCWD = getHeadID();
         changeCWD(remoteGitlet);
         writeContents(getCurrentBranchHead(), headCWD);
