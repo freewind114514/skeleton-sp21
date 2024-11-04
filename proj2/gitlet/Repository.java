@@ -421,16 +421,15 @@ public class Repository {
     }
 
     private static void setBranch(String name, String CID) {
-        File newBranch = join(getBRANCH(), name);
-        if (!newBranch.exists()) {
+        File file = join(getBRANCH(), name);
+        if (!file.exists()) {
             try {
-                newBranch.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        writeContents(newBranch, CID);
-
+        writeContents(file, CID);
     }
 
     public static void rmBranch(String name) {
@@ -710,12 +709,12 @@ public class Repository {
 
     private static void changeCWD(File file) {
         GITLET_DIR = file;
-        COMMIT = join(GITLET_DIR, "commits");
-        BOLBS = join(GITLET_DIR, "bolbs");
-        STAGE = join(GITLET_DIR, "stage");
-        BRANCH = join(GITLET_DIR, "branches");
-        saveHead = join(GITLET_DIR, "head");
-        REMOTE = join(GITLET_DIR, "remotes");
+        COMMIT = join(file, "commits");
+        BOLBS = join(file, "bolbs");
+        STAGE = join(file, "stage");
+        BRANCH = join(file, "branches");
+        saveHead = join(file, "head");
+        REMOTE = join(file, "remotes");
     }
 
     private static void copyCommit(String CID, File copyTO, File copyFrom) {
@@ -762,6 +761,7 @@ public class Repository {
         for (String CID : branchHistory.keySet()) {
             copyCommit(CID, join(CWD, ".gitlet"), remoteGitlet);
         }
+        changeCWD(join(CWD, ".gitlet"));
         String newBranch = remoteName + "/" + remoteBranchName;
         setBranch(newBranch, remoteCID);
     }
