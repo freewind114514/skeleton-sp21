@@ -25,12 +25,13 @@ public class Repository {
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
-    public static final File GITLET_DIR = join(CWD, ".gitlet");
-    public static final File COMMIT = join(GITLET_DIR, "commits");
-    public static final File BOLBS = join(GITLET_DIR, "bolbs");
-    public static final File STAGE = join(GITLET_DIR, "stage");
-    public static final File BRANCH = join(GITLET_DIR, "branches");
-    public static final File saveHead = join(GITLET_DIR, "head");
+    public static File GITLET_DIR = join(CWD, ".gitlet");
+    public static File COMMIT = join(GITLET_DIR, "commits");
+    public static File BOLBS = join(GITLET_DIR, "bolbs");
+    public static File STAGE = join(GITLET_DIR, "stage");
+    public static File BRANCH = join(GITLET_DIR, "branches");
+    public static File saveHead = join(GITLET_DIR, "head");
+    public static File REMOTE = join(GITLET_DIR, "remotes");
     private static String HEAD;
     private static File currentBranchHead;
 
@@ -62,6 +63,7 @@ public class Repository {
         BRANCH.mkdir();
         COMMIT.mkdir();
         BOLBS.mkdir();
+        REMOTE.mkdir();
         try {
             STAGE.createNewFile();
         } catch (IOException e) {
@@ -381,22 +383,24 @@ public class Repository {
     }
 
     public static void branch(String name) {
+        File newBranch = join(BRANCH, name);
+        if (newBranch.exists()){
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
         HEAD = getHeadID();
-        setBranch(name,HEAD);
+        setBranch(name, HEAD);
     }
 
     private static void setBranch(String name, String CID) {
         File newBranch = join(BRANCH, name);
-        if (newBranch.exists()){
-            System.out.println("A branch with that name already exists.");
-        }else {
-            try {
-                newBranch.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            writeContents(newBranch, CID);
+        try {
+            newBranch.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        writeContents(newBranch, CID);
+
     }
 
     public static void rmBranch(String name) {
@@ -424,7 +428,6 @@ public class Repository {
         deleteUntracked(Track, filenames);
         clearSaveStage();
     }
-
 
     public static void merge(String branchName) {
         checkMerge(branchName);
@@ -637,24 +640,130 @@ public class Repository {
         }
     }
 
-    public static void addRemote(String remoteName, String remoteBranchName) {
-
+    public static void addRemote(String remoteName, String userPath) {
+        File remoteFile = join(REMOTE, remoteName);
+        if (remoteFile.exists()) {
+            System.out.println("A remote with that name already exists.");
+            System.exit(0);
+        }
+        try {
+            remoteFile.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String filepath = userPath.replace("/", File.separator);
+        File file = new File(filepath);
+        writeObject(remoteFile, file);
     }
 
     public static void rmRemote(String remoteName) {
-
+        File remoteFile = join(REMOTE, remoteName);
+        if (!remoteFile.exists()) {
+            System.out.println("A remote with that name does not exist.");
+            System.exit(0);
+        }
+        remoteFile.delete();
     }
 
-    public static void push(String remoteName, String remoteBranchName) {
+    private static void notFoundRemote(String remoteName) {
+        File remoteFile = join(REMOTE, remoteName);
+        if (!remoteFile.exists()) {
+            System.out.println("Remote directory not found.");
+            System.exit(0);
+        }
+        File remoteGitlet = readObject(remoteFile, File.class);
+        if (!remoteGitlet.exists()) {
+            System.out.println("Remote directory not found.");
+            System.exit(0);
+        }
+    }
 
+    private static void changeCWD(File file) {
+        GITLET_DIR = join(file, ".gitlet");
+        COMMIT = join(GITLET_DIR, "commits");
+        BOLBS = join(GITLET_DIR, "bolbs");
+        STAGE = join(GITLET_DIR, "stage");
+        BRANCH = join(GITLET_DIR, "branches");
+        saveHead = join(GITLET_DIR, "head");
+        REMOTE = join(GITLET_DIR, "remotes");
+    }
+
+    private static void copyCommit(String CID, File copyTO, File copyFrom) {
+        changeCWD(copyFrom);
+        Commit commit = Commit.fromFile(CID);
+        Map<String, Bolb> bolbs = new TreeMap<>();
+        for (String BID : commit.getTrack().values()) {
+            Bolb content = Bolb.fromfile(BID);
+            bolbs.put(BID, content);
+        }
+        changeCWD(copyTO);
+        File commitFile = join(COMMIT, CID);
+        if (!commitFile.exists()) {
+            commit.saveObject();
+            copyBolbs(bolbs);
+        }
+    }
+
+    private static void copyBolbs(Map<String, Bolb> bolbs) {
+        for (String BID : bolbs.keySet()) {
+            File file = join(BOLBS, BID);
+            Bolb b = bolbs.get(BID);
+            if (!file.exists()) {
+                b.saveObject();
+            }
+        }
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
+        notFoundRemote(remoteName);
+        File remoteGitlet = readObject(join(REMOTE, remoteName), File.class);
+        File remoteBranch = join(remoteGitlet, "branches", remoteBranchName);
+        if (!remoteBranch.exists()) {
+            System.out.println("That remote does not have that branch.");
+            System.exit(0);
+        }
+        String remoteCID = readContentsAsString(remoteBranch);
+        changeCWD(remoteGitlet);
+        // work in remote .gitlet now
+        Commit remoteCommit = Commit.fromFile(remoteCID);
+        Map<String, Integer> branchHistory = getRouteToInit(remoteCommit);
+        changeCWD(CWD);
+        // work back CWD and copy all
+        for (String CID : branchHistory.keySet()) {
+            copyCommit(CID, CWD, remoteGitlet);
+        }
+        String newBranch = remoteName + "/" + remoteBranchName;
+        setBranch(newBranch, remoteCID);
+    }
 
+    public static void push(String remoteName, String remoteBranchName) {
+        notFoundRemote(remoteName);
+        File remoteGitlet = readObject(join(REMOTE, remoteName), File.class);
+        File remoteBranch = join(remoteGitlet, "branches", remoteBranchName);
+        if (!remoteBranch.exists()) {
+            System.out.println("That remote does not have that branch.");
+            System.exit(0);
+        }
+        String remoteCID = readContentsAsString(remoteBranch);
+        Map<String, Integer> currentHistory = getRouteToInit(Commit.fromFile(getHeadID()));
+        if (!currentHistory.containsKey(remoteCID)) {
+            System.out.println("Please pull down remote changes before pushing.");
+            System.exit(0);
+        }
+        for (String CID : currentHistory.keySet()) {
+            copyCommit(CID, remoteGitlet, CWD);
+        }
+        // get CWD head and point remote head to target commit
+        changeCWD(CWD);
+        String headCWD = getHeadID();
+        changeCWD(remoteGitlet);
+        writeContents(getCurrentBranchHead(), headCWD);
     }
 
     public static void pull(String remoteName, String remoteBranchName) {
-
+        fetch(remoteName, remoteBranchName);
+        String remoteBranch = remoteName + "/" + remoteBranchName;
+        merge(remoteBranch);
     }
 
 }
