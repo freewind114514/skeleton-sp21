@@ -57,6 +57,14 @@ public class Repository {
         }
     }
 
+    public static File getCOMMIT() {
+        return COMMIT;
+    }
+
+    public static File getBOLBS() {
+        return BOLBS;
+    }
+
     public static void init() {
         gitletExists();
         GITLET_DIR.mkdir();

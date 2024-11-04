@@ -25,7 +25,7 @@ public class Bolb implements Serializable{
     }
 
     public void saveObject(){
-        File object = join(BOLBS, BID);
+        File object = join(Repository.getBOLBS(), BID);
         try {
             object.createNewFile();
         } catch (IOException e) {
@@ -35,7 +35,7 @@ public class Bolb implements Serializable{
     }
 
     public static Bolb fromfile(String bid){
-        File object = join(BOLBS, bid);
+        File object = join(Repository.getBOLBS(), bid);
         return readObject(object, Bolb.class);
     }
 

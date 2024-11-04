@@ -55,7 +55,7 @@ public class Commit implements Serializable {
         if (id == null){
             return null;
         }
-        File object = join(COMMIT, id);
+        File object = join(Repository.getCOMMIT(), id);
         return readObject(object, Commit.class);
     }
 
@@ -81,7 +81,7 @@ public class Commit implements Serializable {
 
 
     public void saveObject(){
-        File object = join(COMMIT, CID);
+        File object = join(Repository.getCOMMIT(), CID);
         try {
             object.createNewFile();
         } catch (IOException e) {
