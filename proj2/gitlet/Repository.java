@@ -535,14 +535,15 @@ public class Repository {
 
         byte[] headContent;
         byte[] targetContent;
-        String head = "<<<<<<< HEAD\n";
+        String newLine = System.lineSeparator();
+        String head = "<<<<<<< HEAD" + newLine;
         if (currentBId != null) {
             Bolb currentBlob = Bolb.fromfile(currentBId);
             headContent = currentBlob.getContent();
         } else {
             headContent = new byte[0];
         }
-        String separateLine = "=======\n";
+        String separateLine = "=======" + newLine;
         if (targetBId != null) {
             Bolb targetBlob = Bolb.fromfile(targetBId);
             targetContent = targetBlob.getContent();
@@ -550,7 +551,7 @@ public class Repository {
             targetContent = new byte[0];
         }
         String end = ">>>>>>>";
-        writeContents(file, head, headContent, "\n", separateLine, targetContent, "\n", end);
+        writeContents(file, head, headContent, newLine, separateLine, targetContent, newLine, end);
     }
 
     private static void ifAncestor(String branchName, String splitID, String currentID, String givenID) {
