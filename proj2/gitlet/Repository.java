@@ -474,13 +474,11 @@ public class Repository {
         for (String filename : trackGiven.keySet()) {
             givenBID = trackGiven.get(filename);
             if (trackSplit.containsKey(filename) && trackCurrent.containsKey(filename)) {
-                // exist in three
                 splitBID = trackSplit.get(filename);
                 currentBID = trackCurrent.get(filename);
                 if (splitBID.equals(currentBID) && !splitBID.equals(givenBID)) {
                     stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                     checkCommitFile(givenCID, filename);
-                    // case 1
                 }
 
                 if (!currentBID.equals(givenBID)) {
@@ -488,7 +486,6 @@ public class Repository {
                         ifConflict = true;
                         writeConflictFile(filename, currentBID, givenBID);
                         stage.pureAdd(filename, readContents(join(CWD, filename)));
-                        // case 8 in all but modified in different way
                     }
                 }
             }
@@ -496,7 +493,6 @@ public class Repository {
             if (!trackSplit.containsKey(filename) && !trackCurrent.containsKey(filename)) {
                 stage.pureAdd(filename, Bolb.fromfile(givenBID).getContent());
                 checkCommitFile(givenCID, filename);
-                // case 5 only in given
             }
 
             if (!trackSplit.containsKey(filename) && trackCurrent.containsKey(filename)) {
@@ -505,7 +501,6 @@ public class Repository {
                     ifConflict = true;
                     writeConflictFile(filename, currentBID, givenBID);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
-                    // case 8 not in split but modified in different way
                 }
             }
 
@@ -515,7 +510,6 @@ public class Repository {
                     ifConflict = true;
                     writeConflictFile(filename, null, givenBID);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
-                    // case 8 delete in current and modified in given
                 }
             }
         }
@@ -527,16 +521,12 @@ public class Repository {
                 if (currentBID.equals(splitBID)) {
                     stage.remove(filename);
                     join(CWD, filename).delete();
-                    // case 6  delete in given but not modified in current
                 } else {
                     ifConflict = true;
                     writeConflictFile(filename, currentBID, null);
                     stage.pureAdd(filename, readContents(join(CWD, filename)));
-                    // case 8 delete in given and modified in current
                 }
-
             }
-
         }
         stage.save();
         return ifConflict;
